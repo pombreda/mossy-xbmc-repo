@@ -496,8 +496,7 @@ def CreateRTMPDUMPCmd( rtmpdump_path, streamUri, auth, savePath, swfPlayer, prox
 					#"--pageUrl xxxxxx",
 					"--conn", "Z:",
 					"--playpath", '"%s"'%playpath,
-					"-o", '"%s"' % savePath,
-					"--verbose"
+					"-o", '"%s"' % savePath
 					]
 	else:
 		args = [
