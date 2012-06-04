@@ -269,6 +269,7 @@ def GetProxy():
 
 
 def ShowEpisodes( showId, showTitle ):
+	print 'url: ' + "http://www.channel4.com/programmes/" + showId + "/4od"
 	html = geturllib.GetURL( "http://www.channel4.com/programmes/" + showId + "/4od", 20000, GetUrlLibProxies() ) # ~6 hrs
 
 	swfPlayer = GetSwfPlayer( html )	
@@ -277,6 +278,7 @@ def ShowEpisodes( showId, showTitle ):
 		genre = re.search( '<meta name="primaryBrandCategory" content="(.*?)"/>', html, re.DOTALL ).groups()[0]
 	except:
 		print str(html)
+		
 
 	ol = re.search( '<ol class="all-series">(.*?)</div>', html, re.DOTALL ).groups()[0]
 
