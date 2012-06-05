@@ -274,8 +274,8 @@ def ShowEpisodes( showId, showTitle ):
 
 	swfPlayer = GetSwfPlayer( html )	
 
-	print repr(html)
-	print str(html)
+	#print repr(html)
+	#print str(html)
 	genre=''
 	try:	
 		genre = re.search( '<meta name="primaryBrandCategory" content="(.*?)"/>', html, re.DOTALL ).groups()[0]
@@ -288,6 +288,9 @@ def ShowEpisodes( showId, showTitle ):
 		f=open(filepath , 'wb' )
 		f.write(html)
 		f.close()
+
+		dialog = xbmcgui.Dialog()
+		dialog.ok('Error happened','show.html is available at: ' + filepath,'','')
 		
 
 	ol = re.search( '<ol class="all-series">(.*?)</div>', html, re.DOTALL ).groups()[0]
