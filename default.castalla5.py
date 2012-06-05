@@ -281,6 +281,7 @@ def ShowEpisodes( showId, showTitle ):
 		print e
 		f=open( xbmc.translatePath( os.path.join( "special://masterprofile", 'show.html' ) ) )
 		f.write(html)
+		f.close()
 		
 
 	ol = re.search( '<ol class="all-series">(.*?)</div>', html, re.DOTALL ).groups()[0]
