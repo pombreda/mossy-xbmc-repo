@@ -274,13 +274,18 @@ def ShowEpisodes( showId, showTitle ):
 
 	swfPlayer = GetSwfPlayer( html )	
 
+	print repr(html)
+	print str(html)
 	genre=''
 	try:	
 		genre = re.search( '<meta name="primaryBrandCategory" content="(.*?)"/>', html, re.DOTALL ).groups()[0]
 	except Exception, e:
 		print "Excpetion parsing genre..."
 		print e
-		f=open( xbmc.translatePath( os.path.join( "special://masterprofile", 'show.html' ) ), 'wb' )
+		filepath = xbmc.translatePath( os.path.join( "special://masterprofile", 'show.html' ) ) 
+
+		print "show.html is at: " + filepath
+		f=open(filepath , 'wb' )
 		f.write(html)
 		f.close()
 		
