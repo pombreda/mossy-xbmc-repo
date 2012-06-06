@@ -1,0 +1,33 @@
+<strings>
+  <string id="30100">General</string>
+  <string id="30110">Default action on select</string>
+  <string id="30120">Ask</string>
+  <string id="30130">Play</string>
+  <string id="30140">Download</string>
+  <string id="30150">Use paging (list 50 programmes at a time)</string>
+
+  <string id="30200">Downloads</string>
+  <string id="30210">Path to rtmpdump</string>
+  <string id="30220">Default download folder</string>
+  <string id="30230">Ask for folder</string>
+  <string id="30240">Ask for filename</string>
+
+  <string id="30300">Proxy</string>
+  <string id="30310">Use Proxy</string>
+  <string id="30320">Proxy Server/IP (SOCKS4)</string>
+  <string id="30330">Proxy Port</string>
+
+  <string id="30500">Search</string>
+  <string id="30510">Page</string>
+  <string id="30520">WARNING Unable to determine swfPlayer URL. Using default: </string>
+  <string id="30530">Do you want to play or download?</string>
+  <string id="30540">Playback Error</string>
+  <string id="30550">Unable to find MP4 video file to play.</string>
+  <string id="30560">Download Error</string>
+  <string id="30570">You have not located your rtmpdump executable.\n Please update the addon settings and try again.</string>
+  <string id="30580">You have not set the default download folder.\n Please update the addon settings and try again.</string>
+  <string id="30590">Save programme as...</string>
+  <string id="30600">Save to folder...</string>
+  <string id="30610">Starting download</string>
+  <string id="30620">Download Finished</string>
+</strings>
