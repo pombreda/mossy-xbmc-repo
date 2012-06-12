@@ -5,6 +5,8 @@
   <string id="30130">Play</string>
   <string id="30140">Download</string>
   <string id="30150">Use paging (list 50 programmes at a time)</string>
+  <string id="30160">Subtitles</string>
+  <string id="30170">Disable HTTP Cache</string>
 
   <string id="30200">Downloads</string>
   <string id="30210">Path to rtmpdump</string>
@@ -19,7 +21,7 @@
 
   <string id="30500">Search</string>
   <string id="30510">Page</string>
-  <string id="30520">WARNING Unable to determine swfPlayer URL. Using default: </string>
+  <string id="30520">Unable to determine swfPlayer URL. Using default: </string>
   <string id="30530">Do you want to play or download?</string>
   <string id="30540">Playback Error</string>
   <string id="30550">Unable to find MP4 video file to play.</string>
@@ -30,4 +32,17 @@
   <string id="30600">Save to folder...</string>
   <string id="30610">Starting download</string>
   <string id="30620">Download Finished</string>
+  <string id="30700">See log for details</string>
+  <string id="30705">Can't find pattern in string</string>
+  <string id="30710">Can't determine genre</string>
+  <string id="30715">Error getting image</string>
+  <string id="30720">Error finding next page</string>
+  <string id="30725">Cannot determine if this is the last page or not</string>
+  <string id="30730">Exception resolving swfPlayer URL</string>
+  <string id="30735">Error parsing html</string>
+  <string id="30740">Cannot list episodes</string>
+  <string id="30745">Cannot add show to \"Now Playing\"</string>
+  <string id="30750">Error parsing stream info</string>
+  <string id="30755">Cannot proceed</string>
+  <string id="30760">Cannot find show id</string>
 </strings>
