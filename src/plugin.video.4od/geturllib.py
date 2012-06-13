@@ -43,7 +43,7 @@ def _GetURL_NoCache( url, proxies ):
 
 	try: 
 		if proxies is not None:
-			xbmc.log ("proxy: " + proxies[1], xbmc.LOGDEBUG)	
+			xbmc.log ("proxy: " + str(proxies), xbmc.LOGDEBUG)	
 			proxyHandler = urllib2.ProxyHandler(proxies)
 			opener = urllib2.build_opener(proxyHandler)
 			urllib2.install_opener(opener)
