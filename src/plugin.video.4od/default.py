@@ -66,13 +66,13 @@ class ErrorHandler:
 	def process(self, messageHeading = None, messageOverview = '', level = xbmc.LOGDEBUG):
 		if messageHeading is not None:
 			self.messageHeading = messageHeading
-		
+
 		if len(messageOverview) > 0:
 			self.messageOverview = messageOverview + ' - ' + self.messageDetail 
 		else:
 			self.messageOverview = self.messageDetail
-		
-		
+
+
 		if self.messageLog is not None:
 			log('In %s: %s: %s\n%s' % (self.method, self.messageHeading, self.messageOverview, self.messageLog), level)
 		else:
@@ -87,6 +87,8 @@ class ErrorHandler:
 
 
 def findString(method, pattern, string, flags = (re.DOTALL | re.IGNORECASE)):
+	return(re.search( pattern, string, flags ).group(1), None)
+
 	match = re.search( pattern, string, flags )
 	if match is not None:
 		return (match.group(1), None)
@@ -181,27 +183,6 @@ class RTMP:
 		log("command: " + command, xbmc.LOGDEBUG)
 		return command
 
-	def runDownloadCommand(self):
-		command = getDownloadCommand()
-		# Starting download
-		xbmc.executebuiltin('XBMC.Notification(4oD,%s: %s)' % ( __language__(30610), filename))
-		log("Starting download", xbmc.LOGDEBUG)
-
-		p = Popen( cmdline )
-		p.wait()
-
-		#p = Popen( cmdline, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT )
-		#x = p.stdout.read()
-		#import time 
-		#while p.poll() == None:
-		#	time.sleep(2)
-		#x = p.stdout.read()
-
-		# Download Finished!
-		log("Download Finished!", xbmc.LOGDEBUG)
-		xbmc.executebuiltin('XBMC.Notification(%s,%s,2000)' % ( __language__(30620), filename))
-				
-
 	def getPlayUrl(self):
 		socks=''
 
@@ -216,7 +197,7 @@ class RTMP:
 	
 
 #TODO Add more comprehensive debug logging to this class (EpisodeList)
-#TODO There's too much reliance on member variables. Probably many cases 
+#TODO There is much reliance on member variables. Probably many cases 
 #     where member variables are redundant or can be replaced by local vars passed
 #     as parameters or returned from methods. Clean up.
 
@@ -227,7 +208,7 @@ class RTMP:
 # but with a minimum of code duplication
 #
 # Those methods are
-# 1) Parse a web page that lists episodes of a show and create XBMC list items
+# 1) Parse a web page that lists episodes of a show and create an XBMC list item
 #    for each episode
 #
 # 2) Parse the SAME web page to find a particular episode  
@@ -248,7 +229,7 @@ class EpisodeList:
 
 	def initialise(self, showId, showTitle):
 		method = "EpisodeList.initialise"
-		log ("initialise showId: " + showId, xbmc.LOGDEBUG)
+		log ("initialise showId: %s, showTitle: %s " % ( showId, showTitle ), xbmc.LOGDEBUG)
 		self.html = geturllib.GetURL( "http://www.channel4.com/programmes/" + showId + "/4od", 20000, GetUrlLibProxies() ) # ~6 hrs
 
 		self.swfPlayer = GetSwfPlayer( self.html )
@@ -272,7 +253,6 @@ class EpisodeList:
 	def getEpisodeDetails(self, htmlListItem):
 		
 		dataKeyValues = re.findall('data-([a-zA-Z\-]*?)="(.*?)"', htmlListItem, re.DOTALL | re.IGNORECASE )
-		epNumInt	= ''
 		assetId		= ''
 		url		= ''
 		image		= ''
@@ -280,21 +260,21 @@ class EpisodeList:
 		progTitle	= ''
 		epTitle		= ''
 		description	= ''
+		epNum		= ''
 		seriesNum	= ''
 
 
 		for dataKeyValue in dataKeyValues:
 			if ( dataKeyValue[0].lower() == 'episode-number' ):
-				epNum		= dataKeyValue[1]
 				try: 
-					epNumInt = int(epNum)
-				except: 
-					epNumInt = ""
-
+					epNum 	= int(dataKeyValue[1])
+				except:
+					pass
 				continue
+
 			if ( dataKeyValue[0].lower() == 'assetid' ):
 				assetId		= dataKeyValue[1]
-				continue
+				continue 
 			if ( dataKeyValue[0].lower() == 'episodeurl' ):
 				url		= dataKeyValue[1]
 				continue
@@ -302,8 +282,19 @@ class EpisodeList:
 				image		= dataKeyValue[1]
 				continue
 			if ( dataKeyValue[0].lower()  == 'txdate'):
-				premieredDate	= dataKeyValue[1]
+				dateParts = dataKeyValue[1].split()
+				if len(dateParts) == 3:
+					if len(dateParts[0]) == 1:
+						dateParts[0] = '0' + dateParts[0]
+
+					dateParts[1] = (dateParts[1])[0:3]
+
+					premieredDate = "%s %s %s" % (dateParts[0], dateParts[1], dateParts[2])
+				else:
+					premieredDate = dataKeyValue[1]
+
 				continue
+
 			if ( dataKeyValue[0].lower()  == 'episodetitle' ):
 				progTitle	= dataKeyValue[1]
 				continue
@@ -314,14 +305,17 @@ class EpisodeList:
 				description	= dataKeyValue[1]
 				continue
 			if ( dataKeyValue[0].lower() == 'series-number' ):
-				seriesNum	= dataKeyValue[1]
-
+				try: 
+					seriesNum = int(dataKeyValue[1])
+				except:
+					pass
+				continue
 
 
 		if assetId <> '':
-			log ('Episode details: ' + str((assetId,epNumInt,url,image,premieredDate,progTitle,epTitle,description,seriesNum)), xbmc.LOGDEBUG)
+			log ('Episode details: ' + str((assetId,epNum,url,image,premieredDate,progTitle,epTitle,description,seriesNum)), xbmc.LOGDEBUG)
 			self.assetId 		= assetId
-			self.epNumInt 		= epNumInt
+			self.epNum 		= epNum
 			self.url 		= url
 			self.image 		= image
 			self.premieredDate 	= premieredDate
@@ -332,8 +326,8 @@ class EpisodeList:
 
 
 	def refineEpisodeDetails(self):
-		if ( self.seriesNum <> "" and self.epNumInt <> "" ):
-			self.filename = self.showId + ".s%0.2ie%0.2i" % (int(self.seriesNum),self.epNumInt)
+		if ( self.seriesNum <> "" and self.epNum <> "" ):
+			self.filename = self.showId + ".s%0.2ie%0.2i" % (self.seriesNum, self.epNum)
 		else:
 			self.filename = self.showId
 	
@@ -349,12 +343,12 @@ class EpisodeList:
 		if self.label == '':
 			self.label = self.showTitle
 
-		if len(self.premieredDate) > 0:
-			self.label = self.label + '  [' + self.premieredDate + ']'
+		if len(self.premieredDate) > 0 and self.premieredDate not in self.label:
+				self.label = self.label + '  [' + self.premieredDate + ']'
 
 		self.description = remove_extra_spaces(remove_html_tags(self.description))
 		self.description = self.description.replace( '&amp;', '&' )
-		self.adescription = self.description.replace( '&pound;', '£' )
+		self.description = self.description.replace( '&pound;', '£' )
 		self.description = self.description.replace( '&quot;', "'" )
 
 		if (self.image == ""):
@@ -363,19 +357,21 @@ class EpisodeList:
 				# Error getting image
 				error.process(__language__(30715), "", xbmc.LOGWARNING)
 				self.thumbnail = ''
-			
 
 		else:
 			self.thumbnail = "http://www.channel4.com" + self.image
 
 
-
-
-
 	def createNewListItem(self):
 		newListItem = xbmcgui.ListItem( self.label )
 		newListItem.setThumbnailImage(self.thumbnail)
-		newListItem.setInfo('video', {'Title': self.label, 'Plot': self.description, 'PlotOutline': self.description, 'Genre': self.genre, 'premiered': self.premieredDate, 'Episode': self.epNumInt})
+
+		infoLabels = {'Title': self.label, 'Plot': self.description, 'PlotOutline': self.description, 'Genre': self.genre, 'premiered': self.premieredDate}
+
+		if self.epNum <> '':
+			infoLabels['Episode'] = self.epNum
+ 
+		newListItem.setInfo('video', infoLabels)
 
 		return newListItem
 
@@ -425,6 +421,8 @@ class EpisodeList:
 	                if (self.assetId <> matchingAssetId):
         	                continue;
 
+			self.label = ''
+			self.thumbnail = ''
 			self.refineEpisodeDetails()
 
 			newListItem = self.createNewListItem()
@@ -760,6 +758,7 @@ def GetDownloadSettings(defaultFilename):
 def Play(rtmp, showId, episodeId, title):
 	log ('Play showId: ' + showId)
 	log ('Play episodeId: ' + episodeId)
+	log ('Play titleId: ' + title)
 
 	playURL = rtmp.getPlayUrl()		
 	
@@ -770,10 +769,9 @@ def Play(rtmp, showId, episodeId, title):
 	else:
 		# "Error parsing html", "Cannot add show to \"Now Playing\"
 		error.process(__language__(30735), __language__(30745), xbmc.LOGWARNING)
-		
+	
 		listItem = xbmcgui.ListItem(title)
 		listItem.setInfo('video', {'Title': title})
-		
 
 	play=xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
 	play.clear()
@@ -921,7 +919,7 @@ def GetAction():
 
 #==============================================================================
 
-def InitializeRTMP(episodeId, swfPlayer):
+def InitialiseRTMP(episodeId, swfPlayer):
 	# Get the stream info
 	details = GetStreamInfo(episodeId)
 
@@ -951,7 +949,7 @@ def PlayOrDownloadEpisode( showId, episodeId, title, defaultFilename, swfPlayer 
 	log ('PlayOrDownloadEpisode title: ' + title, xbmc.LOGDEBUG)
 
 	
-	rtmp = InitializeRTMP(episodeId, swfPlayer)
+	rtmp = InitialiseRTMP(episodeId, swfPlayer)
 	if isinstance(rtmp, ErrorHandler):
 		error = rtmp
 		# 'Error parsing stream info', 'Cannot proceed'
