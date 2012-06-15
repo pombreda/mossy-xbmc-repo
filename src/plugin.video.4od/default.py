@@ -47,7 +47,6 @@ def get_system_platform():
         platform = "osx"
 
     log("Platform: %s" % platform, xbmc.LOGDEBUG)
-#    Trace("Platform: %s"%platform)
     return platform
 
 __platform__     = get_system_platform()
@@ -87,8 +86,6 @@ class ErrorHandler:
 
 
 def findString(method, pattern, string, flags = (re.DOTALL | re.IGNORECASE)):
-	return(re.search( pattern, string, flags ).group(1), None)
-
 	match = re.search( pattern, string, flags )
 	if match is not None:
 		return (match.group(1), None)
@@ -110,7 +107,6 @@ class RTMP:
                 self.app = None
                 self.playPath = None
                 self.swfPlayer = None
-		self.proxy = None
 
 		self.rtmpdumpPath = None
                 self.savePath = None
@@ -157,10 +153,6 @@ class RTMP:
 		log ("setDownloadDetails savePath: " + self.savePath, xbmc.LOGDEBUG)
 
 
-	def setProxy(self, proxy):
-                self.proxy = proxy
-		log ("proxy: " + self.proxy, xbmc.LOGDEBUG)
-
 	def getParameters(self):
 		args = [
 			"--rtmp", '"%s"' % self.url,
@@ -174,22 +166,14 @@ class RTMP:
 			"-o", '"%s"' % self.savePath
 			]
 
-		if self.proxy is not None:
-			args.append("--socks")
-			args.append('"%s"' % self.proxy)
-
 		command = ' '.join(args)
 
 		log("command: " + command, xbmc.LOGDEBUG)
 		return command
 
 	def getPlayUrl(self):
-		socks=''
 
-		if self.proxy is not None:
-			socks=' socks=' + self.proxy
-
-		playURL = "%s?ovpfv=1.1&%s playpath=%s swfurl=%s swfvfy=true%s" % (self.url,self.auth,self.playPath,self.swfPlayer,socks)
+		playURL = "%s?ovpfv=1.1&%s playpath=%s swfurl=%s swfvfy=true" % (self.url,self.auth,self.playPath,self.swfPlayer)
 
 		log("playURL: " + playURL, xbmc.LOGDEBUG)
 		return playURL
@@ -230,7 +214,11 @@ class EpisodeList:
 	def initialise(self, showId, showTitle):
 		method = "EpisodeList.initialise"
 		log ("initialise showId: %s, showTitle: %s " % ( showId, showTitle ), xbmc.LOGDEBUG)
-		self.html = geturllib.GetURL( "http://www.channel4.com/programmes/" + showId + "/4od", 20000, GetUrlLibProxies() ) # ~6 hrs
+		self.html = geturllib.GetURL( "http://www.channel4.com/programmes/" + showId + "/4od", 20000 ) # ~6 hrs
+
+		if self.html == '':
+			error = ErrorHandler('EpisodeList.initialise', 'Error getting episode list web page', 'See previous error')
+			return error
 
 		self.swfPlayer = GetSwfPlayer( self.html )
 
@@ -328,9 +316,11 @@ class EpisodeList:
 	def refineEpisodeDetails(self):
 		if ( self.seriesNum <> "" and self.epNum <> "" ):
 			self.filename = self.showId + ".s%0.2ie%0.2i" % (self.seriesNum, self.epNum)
+		elif len(self.premieredDate) > 0:
+			self.filename = self.showId + "." + self.premieredDate.replace( ' ', '.' )
 		else:
-			self.filename = self.showId
-	
+			self.filename = self.showId + "." + self.assetId
+
 		self.progTitle = self.progTitle.strip()
 		self.progTitle = self.progTitle.replace( '&amp;', '&' )
 		self.epTitle = self.epTitle.strip()
@@ -437,7 +427,14 @@ class EpisodeList:
 #==============================================================================
 
 def ShowCategories():
-	html = geturllib.GetURL( "http://www.channel4.com/programmes/tags/4od", 200000, GetUrlLibProxies() ) # ~2 days
+	html = geturllib.GetURL( "http://www.channel4.com/programmes/tags/4od", 200000 ) # ~2 days
+
+	if html == '':
+		error = ErrorHandler('ShowCategories', 'Error getting category web page', 'See previous error')
+		# 'Cannot show categories','Error getting category web page'
+		error.process(__language__(30765), __language__(30770), xbmc.LOGERROR)
+		return error
+
 	html = re.findall( '<ol class="display-cats">(.*?)</div>', html, re.DOTALL | re.IGNORECASE )[0]
 	categories = re.findall( '<a href="/programmes/tags/(.*?)/4od">(.*?)</a>', html, re.DOTALL | re.IGNORECASE )
 	
@@ -454,6 +451,8 @@ def ShowCategories():
 	xbmcplugin.addDirectoryItems( handle=__PluginHandle__, items=listItems )
 	xbmcplugin.endOfDirectory( handle=__PluginHandle__, succeeded=True )
 		
+	return None
+
 
 #==============================================================================
 # GetThumbnailPath
@@ -477,7 +476,12 @@ def GetThumbnailPath(thumbnail):
 #==============================================================================
 
 def AddExtraLinks(category, label, order, listItems):
-	html = geturllib.GetURL( "http://www.channel4.com/programmes/tags/%s/4od%s" % (category, order), 40000, GetUrlLibProxies() ) # ~12 hrs
+	html = geturllib.GetURL( "http://www.channel4.com/programmes/tags/%s/4od%s" % (category, order), 40000 ) # ~12 hrs
+
+	if html == '':
+		error = ErrorHandler('AddExtraLinks', 'Error getting programme list web page', 'See previous error')
+		return error
+
 
 	extraInfos = re.findall( '<a href="/programmes/tags/%s/4od(.*?)">(.*?)</a>' % (category) , html, re.DOTALL | re.IGNORECASE )
 
@@ -502,6 +506,7 @@ def AddExtraLinks(category, label, order, listItems):
 		url = __BaseURL__ + '?category=' + mycgi.URLEscape(category) + '&title=' + mycgi.URLEscape(label) + '&order=' + mycgi.URLEscape(newOrder) + '&page=' + mycgi.URLEscape('1')
 		listItems.append( (url,newListItem,True) )
 
+	return None
 
 #==============================================================================
 # AddPageLink
@@ -534,7 +539,12 @@ def AddPageLink(category, order, previous, page, listItems):
 #==============================================================================
 
 def AddPageToListItems( category, label, order, page, listItems ):
-	html = geturllib.GetURL( "http://www.channel4.com/programmes/tags/%s/4od%s/brand-list/page-%s" % (category, order, page), 40000, GetUrlLibProxies() ) # ~12 hrs
+	html = geturllib.GetURL( "http://www.channel4.com/programmes/tags/%s/4od%s/brand-list/page-%s" % (category, order, page), 40000 ) # ~12 hrs
+
+	if html == '':
+		error = ErrorHandler('AddPageToListItems', 'Error getting programme list web page', 'See previous error')
+		return error
+
 	showsInfo = re.findall( '<li.*?<a class=".*?" href="/programmes/(.*?)/4od".*?<img src="(.*?)".*?<p class="title">(.*?)</p>.*?<p class="synopsis">(.*?)</p>', html, re.DOTALL | re.IGNORECASE )
 
 	for showInfo in showsInfo:
@@ -569,7 +579,11 @@ def ShowCategory( category, label, order, page ):
 
 	pageInt = int(page)
 	if pageInt == 1:
-		AddExtraLinks(category, label, order, listItems)
+		error = AddExtraLinks(category, label, order, listItems)
+		if error is not None:
+			# 'Cannot show Most Popular/A-Z/Latest', 'Error processing web page'
+			error.process(__language__(30775), __language__(30780), xbmc.LOGWARNING)
+
 
 	paging = __addon__.getSetting( 'paging' )
 
@@ -578,6 +592,11 @@ def ShowCategory( category, label, order, page ):
 			AddPageLink(category, order, True, str(pageInt - 1), listItems)
 
 		nextUrl = AddPageToListItems( category, label, order, page, listItems )
+		if isinstance(nextUrl, ErrorHandler):
+			error = nextUrl
+			# 'Cannot show category', 'Error processing web page'
+			error.process(__language__(30785), __language__(30780), xbmc.LOGERROR)
+			return		
 
 		if (nextUrl.lower() <> 'endofresults'):
 			nextPage = str(pageInt + 1)
@@ -587,10 +606,15 @@ def ShowCategory( category, label, order, page ):
 		nextUrl = ''
 		while len(listItems) < 500 and nextUrl.lower() <> 'endofresults':
 			nextUrl = AddPageToListItems( category, label, order, page, listItems )
+			if isinstance(nextUrl, ErrorHandler):
+				error = nextUrl
+				# 'Cannot show category', 'Error processing web page'
+				error.process(__language__(30785), __language__(30780), xbmc.LOGERROR)
+				return		
+
 			pageInt = pageInt + 1
 			page = str(pageInt)
 			
-
 
 	xbmcplugin.addDirectoryItems( handle=__PluginHandle__, items=listItems )
 	xbmcplugin.setContent(handle=__PluginHandle__, content='tvshows')
@@ -630,31 +654,8 @@ def GetSwfPlayer( html ):
 	
 	return swfPlayer
 
+
 #==============================================================================
-
-def GetProxy():
-    proxy_server = None
-    proxy_port = None
-
-    try:
-	proxy_use = __addon__.getSetting('proxy_use')
-
-	if proxy_use == 'true':
-	        proxy_server = __addon__.getSetting('proxy_server')
-	        proxy_port = int(__addon__.getSetting('proxy_port'))
-    except:
-        pass
-
-
-    if proxy_server is None or proxy_server == '' or proxy_port is None or proxy_port == '':
-        log ('Proxy: None', xbmc.LOGDEBUG)
-	return None
-
-    log ('Proxy: ' + str(proxy_use) + ' , ' + proxy_server + ', ' + str(proxy_port), xbmc.LOGDEBUG)
-    
-    return '%s:%s' % (proxy_server, proxy_port)
-
-
 
 def ShowEpisodes( showId, showTitle ):
 	episodeList = EpisodeList()
@@ -674,7 +675,7 @@ def ShowEpisodes( showId, showTitle ):
 #==============================================================================
 
 def SetSubtitles(episodeId, filename = None):
-	subtitle = geturllib.GetURL( "http://ais.channel4.com/subtitles/%s" % episodeId, 0, GetUrlLibProxies() )
+	subtitle = geturllib.GetURL( "http://ais.channel4.com/subtitles/%s" % episodeId, 0 )
 	
 	log('Subtitle code: ' + str(geturllib.GetLastCode()), xbmc.LOGDEBUG )
 	log('Subtitle filename: ' + str(filename), xbmc.LOGDEBUG)
@@ -789,11 +790,11 @@ def Play(rtmp, showId, episodeId, title):
 
 def Download(rtmp, defaultFilename):
 	(rtmpdumpPath, downloadFolder, filename) = GetDownloadSettings(defaultFilename)
-				
+	
 	savePath = os.path.join( downloadFolder, filename )
 
 	rtmp.setDownloadDetails(rtmpdumpPath, savePath)
-		
+
 	parameters = rtmp.getParameters()
 
 	from subprocess import Popen, PIPE, STDOUT
@@ -874,7 +875,11 @@ def GetAuthentication(uriData):
 #==============================================================================
 
 def GetStreamInfo(episodeId):
-	xml = geturllib.GetURL( "http://ais.channel4.com/asset/%s" % episodeId, 0, GetUrlLibProxies() )
+	xml = geturllib.GetURL( "http://ais.channel4.com/asset/%s" % episodeId, 0 )
+	if xml == '':
+		error = ErrorHandler('GetStreamInfo', 'Error getting stream info xml', 'See previous error')
+		return error
+
 	(uriData, error) = findString('GetStreamInfo', '<uriData>(.*?)</uriData>', xml)
 	if error is not None:
 		return error
@@ -934,11 +939,6 @@ def InitialiseRTMP(episodeId, swfPlayer):
 	if error is not None:
 		return error
 
-	proxy=GetProxy()
-	
-	if proxy is not None:
-		rtmp.setProxy(proxy)
-
 	return rtmp
 
 #==============================================================================
@@ -970,16 +970,6 @@ def PlayOrDownloadEpisode( showId, episodeId, title, defaultFilename, swfPlayer 
 
 #==============================================================================
 
-def GetUrlLibProxies():
-	proxy = GetProxy()
-	
-	if proxy is None  or proxy == '':
-		return None
-
-	return {'http' : 'http://%s' % proxy}
-
-#==============================================================================
-
 def DoSearch():
 	# Search
 	kb = xbmc.Keyboard( "", __language__(30500) )
@@ -991,7 +981,11 @@ def DoSearch():
 #==============================================================================
 
 def DoSearchQuery( query ):
-	data = geturllib.GetURL( "http://www.channel4.com/search/predictive/?q=%s" % mycgi.URLEscape(query), 10000, GetUrlLibProxies() )
+	data = geturllib.GetURL( "http://www.channel4.com/search/predictive/?q=%s" % mycgi.URLEscape(query), 10000 )
+	if data == '':
+		error = ErrorHandler('DoSearchQuery', 'Error getting search web page', 'See previous error')
+		return error
+
 	infos = re.findall( '{"imgUrl":"(.*?)".*?"value": "(.*?)".*?"siteUrl":"(.*?)","fourOnDemand":"true"}', data, re.DOTALL | re.IGNORECASE )
 	listItems = []
 	for info in infos:

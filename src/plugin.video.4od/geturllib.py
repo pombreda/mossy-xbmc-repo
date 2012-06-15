@@ -3,11 +3,62 @@
 import os
 import time
 
-import xbmc
+import xbmc,xbmcaddon
+
+import urllib2,socket,gzip,StringIO
+import socks
+
+__PluginName__  = 'plugin.video.4od'
+__addon__ = xbmcaddon.Addon(__PluginName__)
 
 gCacheDir = ""
 gCacheSize = 20
 gLastCode = -1
+
+
+#==============================================================================
+
+def GetProxy():
+    proxy_server = None
+    proxy_type_id = 0
+    proxy_port = 8080
+    proxy_user = None
+    proxy_pass = None
+    try:
+        proxy_server = __addon__.getSetting('proxy_server')
+        proxy_type_id = __addon__.getSetting('proxy_type')
+        proxy_port = int(__addon__.getSetting('proxy_port'))
+        proxy_user = __addon__.getSetting('proxy_user')
+        proxy_pass = __addon__.getSetting('proxy_pass')
+    except:
+        pass
+
+    if   proxy_type_id == '0': proxy_type = socks.PROXY_TYPE_HTTP_NO_TUNNEL
+    elif proxy_type_id == '1': proxy_type = socks.PROXY_TYPE_HTTP
+    elif proxy_type_id == '2': proxy_type = socks.PROXY_TYPE_SOCKS4
+    elif proxy_type_id == '3': proxy_type = socks.PROXY_TYPE_SOCKS5
+
+    proxy_dns = True
+
+    if proxy_user == '':
+	    proxy_user = None
+
+    if proxy_pass == '':
+	    proxy_pass = None
+
+    return (proxy_type, proxy_server, proxy_port, proxy_dns, proxy_user, proxy_pass)
+
+
+#==============================================================================
+
+def SetupProxy():
+        if __addon__.getSetting('proxy_use') == 'true':
+		(proxy_type, proxy_server, proxy_port, proxy_dns, proxy_user, proxy_pass) = GetProxy()
+
+                xbmc.log("Using proxy: type %i rdns: %i server: %s port: %s user: %s pass: %s" % (proxy_type, proxy_dns, proxy_server, proxy_port, "***", "***") )
+
+		socks.setdefaultproxy(proxy_type, proxy_server, proxy_port, proxy_dns, proxy_user, proxy_pass)
+		socks.wrapmodule(urllib2)
 
 #==============================================================================
 
@@ -35,55 +86,26 @@ def _CheckCacheDir():
 
 #==============================================================================
 
-def _GetURL_NoCache( url, proxies ):
+def _GetURL_NoCache( url ):
+
 	global gLastCode
 	xbmc.log ("url: " + url, xbmc.LOGDEBUG)	
-	import urllib
-        import urllib2,time,socket,gzip,StringIO
 
-	try: 
-		if proxies is not None:
-			xbmc.log ("proxy: " + str(proxies), xbmc.LOGDEBUG)	
-			proxyHandler = urllib2.ProxyHandler(proxies)
-			opener = urllib2.build_opener(proxyHandler)
-			urllib2.install_opener(opener)
+	SetupProxy()
+	try:
 
 		response = urllib2.urlopen(url)
 
 	except ( urllib2.HTTPError ) as err:
-		xbmc.log ( 'HTTPError: ' + str(err) )
+		xbmc.log ( 'HTTPError: ' + str(err), xbmc.LOGERROR)
 		gLastCode = err.code
 		xbmc.log ("gLastCode: " + str(gLastCode), xbmc.LOGDEBUG)
 		return ''
 	except ( urllib2.URLError ) as err:
-		xbmc.log ( 'URLError: ' + str(err) )
+		xbmc.log ( 'URLError: ' + str(err), xbmc.LOGERROR )
 		gLastCode = -1
 		return ''
 
-#	except ( urllib2.HTTPError, urllib2.URLError ) as err:
-#		xbmc.log ( str(err) )
-#		xbmc.log ( str(err.reason) )
-#
-#		if 'problem while looking for the requested subtitle' in err.reason:
-#			#Do this neater
-#			try: 
-#				xbmc.log ( "Second attempt retrieving url" )
-#				if proxies is not None:
-#					xbmc.log ("proxy: " + proxies[1], xbmc.LOGDEBUG)	
-##					proxyHandler = urllib2.ProxyHandler(proxies)
-#					opener = urllib2.build_opener(proxyHandler)
-#					urllib2.install_opener(opener)
-##
-#				response = urllib2.urlopen(url)
-##
-#			except ( urllib2.HTTPError ) as err:
-#				xbmc.log ( 'HTTPError: ' + str(err) )
-#				gLastCode = err.code
-#				return ''
-#			except ( urllib2.URLError ) as err:
-#				xbmc.log ( 'URLError: ' + str(err) )
-#				return ''
-#
 
 	gLastCode = response.getcode()
 	xbmc.log ("gLastCode: " + str(gLastCode), xbmc.LOGDEBUG)
@@ -108,14 +130,14 @@ def CachePage(url, data):
 		_Cache_Add( url, data )
 
 
-def GetURL( url, maxAgeSeconds=0, proxies = None ):
+def GetURL( url, maxAgeSeconds=0 ):
 	global gLastCode
 
 	xbmc.log ("GetURL: " + url, xbmc.LOGDEBUG)
 	# If no cache dir has been specified then return the data without caching
 	if _CheckCacheDir() == False:
        		xbmc.log ("Not caching HTTP", xbmc.LOGDEBUG)
-		return _GetURL_NoCache( url, proxies )
+		return _GetURL_NoCache( url )
 
 
 	if ( maxAgeSeconds > 0 ):
@@ -128,7 +150,7 @@ def GetURL( url, maxAgeSeconds=0, proxies = None ):
 			if ( (time.time() - cachedURLTimestamp) > maxAgeSeconds ):
 	       			xbmc.log ("Cached version is too old", xbmc.LOGDEBUG)
 				# Too old, so need to get it again
-				data = _GetURL_NoCache( url, proxies )
+				data = _GetURL_NoCache( url )
 
 				# Cache it
 				CachePage(url, data)
@@ -146,7 +168,7 @@ def GetURL( url, maxAgeSeconds=0, proxies = None ):
 					xbmc.log("Error retrieving page from cache. Zero length page. Retrieving from web.")
 	
 	# maxAge = 0 or URL not in cache, so get it
-	data = _GetURL_NoCache( url, proxies )
+	data = _GetURL_NoCache( url )
 	CachePage(url, data)
 
 	# Cache it

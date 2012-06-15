@@ -16,8 +16,11 @@
 
   <string id="30300">Proxy</string>
   <string id="30310">Use Proxy</string>
-  <string id="30320">Proxy Server/IP (SOCKS4)</string>
+  <string id="30315">Proxy Type</string>
+  <string id="30320">Proxy Server/IP</string>
   <string id="30330">Proxy Port</string>
+  <string id="30340">Proxy Username</string>
+  <string id="30350">Proxy Password</string>
 
   <string id="30500">Search</string>
   <string id="30510">Page</string>
@@ -45,4 +48,9 @@
   <string id="30750">Error parsing stream info</string>
   <string id="30755">Cannot proceed</string>
   <string id="30760">Cannot find show id</string>
+  <string id="30765">Cannot show categories</string>
+  <string id="30770">Error getting category web page</string>
+  <string id="30775">Cannot show Most Popular/A-Z/Latest</string>
+  <string id="30780">Error processing web page</string>
+  <string id="30785">Cannot show category</string>
 </strings>

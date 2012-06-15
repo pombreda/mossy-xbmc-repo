@@ -1,3 +1,23 @@
+-Version 1.0.4 (1? June 2012)
+
+- Added subtitle support. Off by default, change in settings
+
+- Added "Now Playing" media info
+
+- Added HTTP cache disable option in settings
+
+- (John Taylor) Added gzip handling. Occassionally web pages are downloaded compressed. This fix handles those occassions.
+
+- Improved error handling
+
+- Bug fix: Latest/Most Popular/A-Z/etc. thumbnails coming up blank
+
+- Bug fix: Prevent caching of 0-byte pages or 404 error pages.
+
+- Bug fix: Orphaned processes in Linux, one for each downloaded episode, causing delays in shutting down XBMC.
+
+- Bug fix: Instant "Download Finished" notification but no download in Windows. Should now download.
+
 Version 1.0.3 (03 June 2012)
 
 - Added sort by Latest, Most Popular, or alphabetically
