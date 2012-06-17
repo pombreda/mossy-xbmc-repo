@@ -96,18 +96,20 @@ def _GetURL_NoCache( url ):
 
 		response = urllib2.urlopen(url)
 
-	except ( urllib2.HTTPError ) as err:
+	except urllib2.HTTPError, err:
 		xbmc.log ( 'HTTPError: ' + str(err), xbmc.LOGERROR)
+
 		gLastCode = err.code
 		xbmc.log ("gLastCode: " + str(gLastCode), xbmc.LOGDEBUG)
 		return ''
-	except ( urllib2.URLError ) as err:
+
+	except urllib2.URLError, err:
 		xbmc.log ( 'URLError: ' + str(err), xbmc.LOGERROR )
 		gLastCode = -1
 		return ''
 
 
-	gLastCode = response.getcode()
+	gLastCode = response.code
 	xbmc.log ("gLastCode: " + str(gLastCode), xbmc.LOGDEBUG)
 
         try:

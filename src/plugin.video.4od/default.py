@@ -469,6 +469,14 @@ def GetThumbnailPath(thumbnail):
 	return urlunparse(('file', '', os.path.join(MEDIA_PATH, thumbnail + '.jpg'), '', '', ''))
 #
 
+def ExtractLabel(label):
+#	newLabel = re.search( '[\s*(.*?)\s*]', uriData, re.DOTALL | re.IGNORECASE )
+#	if (newLabel):
+#		label = newLabel.group(1)
+
+	return label
+	
+
 #==============================================================================
 # AddExtraLinks
 #
@@ -485,6 +493,11 @@ def AddExtraLinks(category, label, order, listItems):
 
 	extraInfos = re.findall( '<a href="/programmes/tags/%s/4od(.*?)">(.*?)</a>' % (category) , html, re.DOTALL | re.IGNORECASE )
 
+	print "xxxlabel: " + label
+	#label = ExtractLabel(label)
+	label = category.capitalize()
+	print "xxxlabel2: " + label
+
 
 	for extraInfo in extraInfos:
 		if extraInfo[1] == 'Show More':
@@ -498,6 +511,7 @@ def AddExtraLinks(category, label, order, listItems):
 		else:
 			thumbnail = remove_leading_slash(thumbnail)
 
+		print "xxxthumbnail: " + thumbnail
 		thumbnailPath = GetThumbnailPath(thumbnail)
 		newLabel = ' [' + extraInfo[1] + ' ' + remove_extra_spaces(remove_brackets(label))+ ']'
 		newListItem = xbmcgui.ListItem( label=newLabel )
@@ -521,6 +535,7 @@ def AddPageLink(category, order, previous, page, listItems):
 		thumbnail = 'previous'
 		arrows = '<<'
 
+	print "xxxpage: %s, thumbnail: %s" % (page, thumbnail)
 	thumbnailPath = GetThumbnailPath(thumbnail)
 	# E.g. [Page 2] >>
 	label = '[' + __language__(30510) + ' ' + page + '] ' + arrows
@@ -578,6 +593,7 @@ def ShowCategory( category, label, order, page ):
 	listItems = []
 
 	pageInt = int(page)
+	print "page %s, xxxpageInt %i " % (page, pageInt)
 	if pageInt == 1:
 		error = AddExtraLinks(category, label, order, listItems)
 		if error is not None:

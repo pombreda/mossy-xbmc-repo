@@ -1,5 +1,7 @@
 Version 1.0.5 (17 June 2012)
 
+- Added fanart
+
 - Bug fix: [xbox] Fix incompatibility problems: "response.getCode()" and "XXXError as err"
 
 - Bug fix: Error in "Most Popular"/"Latest" etc. titles appearing as, e.g. "Most Popular [Page 2] >>" after navigating to next page and back
