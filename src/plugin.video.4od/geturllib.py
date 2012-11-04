@@ -8,15 +8,61 @@ import xbmc,xbmcaddon
 import urllib2,socket,gzip,StringIO
 import socks
 
+from errorhandler import ErrorCodes
+from errorhandler import ErrorHandler
+
 __PluginName__  = 'plugin.video.4od'
 __addon__ = xbmcaddon.Addon(__PluginName__)
+__language__ = __addon__.getLocalizedString
 
 gCacheDir = ""
 gCacheSize = 20
 gLastCode = -1
-
+gFromCache = False
+gSocketTimedOut = False
 
 #==============================================================================
+class CacheHelper:
+
+	def __init__(self):
+		self.cacheAttempt = True
+
+	# Use the given maxAge on cache attempt. If this attempt fails then try again with maxAge = 0 (don't retrieve from cache)
+	def ifCacheMaxAge(self, maxAge):
+		if self.cacheAttempt:
+			return maxAge
+
+		return 0
+
+	# Log level is debug if we are processes a page from the cache, 
+	# because we don't want to display errors or halt processing 
+	# unless we are processing a page directly from the web
+	def ifCacheLevel(self, logLevel):
+		if self.cacheAttempt:
+			return xbmc.LOGDEBUG;
+
+		return logLevel
+
+	def setCacheAttempt(self, newCacheAttempt):
+		self.cacheAttempt = newCacheAttempt
+
+	def getCacheAttempt(self):
+		return self.cacheAttempt
+
+	# Get url from cache iff cacheAttempt is True, otherwise get directly from web (maxAge = 0)
+	# If the page was not in the cache then set cacheAttempt to False, indicating that the page was
+	# retrieved from the web
+	def GetURLFromCache(self, url, maxAge):
+		maxAge = self.ifCacheMaxAge(maxAge)
+		html = GetURL( url, maxAge )
+
+		if not _Cache_GetFromFlag():
+			self.cacheAttempt = False
+
+		logLevel = self.ifCacheLevel(xbmc.LOGERROR)
+
+		return html, logLevel
+
 
 def GetProxy():
     proxy_server = None
@@ -76,6 +122,11 @@ def SetCacheDir( cacheDir ):
 		os.makedirs(gCacheDir)
 
 #==============================================================================
+def _Cache_ResetFromFlag():
+	gFromCache = False
+
+def _Cache_GetFromFlag():
+	return gFromCache
 
 def _CheckCacheDir():
 	if ( gCacheDir == '' ):
@@ -89,28 +140,57 @@ def _CheckCacheDir():
 def _GetURL_NoCache( url ):
 
 	global gLastCode
+	global gSocketTimedOut
+
 	xbmc.log ("url: " + url, xbmc.LOGDEBUG)	
 
 	SetupProxy()
-	try:
+	repeat = True
+	firstTime = True
+	while repeat:
+		repeat = False
+		try:
+			response = urllib2.urlopen(url)
 
-		response = urllib2.urlopen(url)
+		except ( urllib2.HTTPError ) as err:
+			xbmc.log ( 'HTTPError: ' + str(err), xbmc.LOGERROR)
+			gLastCode = err.code
+			xbmc.log ("gLastCode: " + str(gLastCode), xbmc.LOGDEBUG)
+			return ''
+		except ( urllib2.URLError ) as err:
+			xbmc.log ( 'URLError: ' + str(err), xbmc.LOGERROR )
+			gLastCode = -1
+			return ''
+		except ( socket.timeout ) as exception:
+			xbmc.log ( 'Timeout exception: ' + str(exception), xbmc.LOGERROR )
+			if firstTime:
+				repeat = True
+			else:
+				# The while loop is normally only processed once.
+				# When a socket timeout happens it executes twice.
+				# The following code executes after the second timeout.
+				
+				# The cache retry mechanism may cause this code to be executed twice,
+				# 'gSocketTimedOut' ensures that the Socket timeout error message only appears once   
+				if not gSocketTimedOut:
+					xbmc.executebuiltin('XBMC.Notification(4oD %s, %s)' % ('', __language__(30895)))
+					gSocketTimedOut = True
+					return None
+				else:
+					# 'Change the socket timeout in the plugin setting if you see this problem a lot', 'Timeout occurred two times in a row' 
+					error = ErrorHandler('_GetURL_NoCache', ErrorCodes.CHANGE_SOCKET_TIMEOUT, __language__(30865))
 
-	except urllib2.HTTPError, err:
-		xbmc.log ( 'HTTPError: ' + str(err), xbmc.LOGERROR)
+					# 'Socket timed out'
+					error.process(__language__(30870), '', xbmc.LOGERROR )
+					return None
 
-		gLastCode = err.code
-		xbmc.log ("gLastCode: " + str(gLastCode), xbmc.LOGDEBUG)
-		return ''
+			firstTime = False
 
-	except urllib2.URLError, err:
-		xbmc.log ( 'URLError: ' + str(err), xbmc.LOGERROR )
-		gLastCode = -1
-		return ''
-
-
-	gLastCode = response.code
+	gSocketTimedOut = False
+	
+	gLastCode = response.getcode()
 	xbmc.log ("gLastCode: " + str(gLastCode), xbmc.LOGDEBUG)
+#	xbmc.log ("response info: " + response.info(), xbmc.LOGDEBUG)
 
         try:
                 if response.info()['content-encoding'] == 'gzip':
@@ -127,7 +207,7 @@ def _GetURL_NoCache( url ):
 def CachePage(url, data):
 	global gLastCode
 
-	if gLastCode <> 404 and len(data) > 0:	# Don't cache "page not found" pages, or empty data
+	if gLastCode <> 404 and data is not None and len(data) > 0:	# Don't cache "page not found" pages, or empty data
 		xbmc.log ("Add page to cache", xbmc.LOGDEBUG)
 		_Cache_Add( url, data )
 
@@ -157,6 +237,9 @@ def GetURL( url, maxAgeSeconds=0 ):
 				# Cache it
 				CachePage(url, data)
 
+				# Cache size maintenance
+				_Cache_Trim
+
 				# Return data
 				return data
 			else:
@@ -172,11 +255,6 @@ def GetURL( url, maxAgeSeconds=0 ):
 	# maxAge = 0 or URL not in cache, so get it
 	data = _GetURL_NoCache( url )
 	CachePage(url, data)
-
-	# Cache it
-	if gLastCode <> 404 and len(data) > 0:	# Don't cache "page not found" pages, or empty data
-		xbmc.log ("Add page to cache", xbmc.LOGDEBUG)
-		_Cache_Add( url, data )
 
 	# Cache size maintenance
 	_Cache_Trim
@@ -200,6 +278,7 @@ def _Cache_GetData( url ):
 	gLastCode = 200
 	cacheKey = _Cache_CreateKey( url )
 	cacheFileFullPath = os.path.join( gCacheDir, cacheKey )
+	xbmc.log ("Cache file: %s" % cacheFileFullPath, xbmc.LOGDEBUG)
 	f = file(cacheFileFullPath, "r")
 	data = f.read()
 	f.close()
@@ -207,6 +286,7 @@ def _Cache_GetData( url ):
 	if len(data) == 0:
 		os.remove(cacheFileFullPath)
 
+	gFromCache = True
 
 	return data
 
@@ -215,6 +295,7 @@ def _Cache_GetData( url ):
 def _Cache_Add( url, data ):
 	cacheKey = _Cache_CreateKey( url )
 	cacheFileFullPath = os.path.join( gCacheDir, cacheKey )
+	xbmc.log ("Cache file: %s" % cacheFileFullPath, xbmc.LOGDEBUG)
 	f = file(cacheFileFullPath, "w")
 	f.write(data)
 	f.close()

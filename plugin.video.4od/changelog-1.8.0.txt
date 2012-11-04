@@ -1,4 +1,4 @@
-Version 1.8.0 (05 Nov 2012)
+Version 1.6.0 (05 Nov 2012)
 - Workaround for the "No MP4 found" problem, automatically uses 4od's Youtube channels for videos that fail to play. Only works for Ch4 made programmes, so still no US shows.
 
 - Added socket timeout handling

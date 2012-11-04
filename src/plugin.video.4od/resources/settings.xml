@@ -5,8 +5,8 @@
 	 <setting id="select_action" type="labelenum" label="30110" default="30120" values="Ask|Play|Download"/>
 	 <setting id="paging" type="bool" label="30150" default="true"/>
 	 <setting id="subtitles" type="bool" label="30160" default="false"/>
-	 <setting id="http_cache_disable" label="30170" type="bool" default="false" />
 	</category>
+
 	  <!-- Proxy -->
         <category label="30300">
          <setting id="proxy_use" label="30310" type="bool" default="false" />
@@ -16,6 +16,7 @@
          <setting id="proxy_user" label="30340" type="text" enable="eq(-4,true)"  />
          <setting id="proxy_pass" label="30350" type="text" option="hidden" enable="!eq(-4,2) + eq(-5,true)" />
 	</category>
+
 	<!-- Downloads -->
 	<category label="30200">
 	 <setting id="rtmpdump_path" type="file" label="30210" default=""/>
@@ -24,4 +25,15 @@
 	 <setting id="ask_filename" type="bool" label="30240" default="false"/>
 	</category>
 
+	<!-- Advanced -->
+	<category label="30400">
+	 <setting id="youtube_enable" type="bool" label="30410" default="true"/>
+
+	<!--
+	 <setting id="youtube_forced" type="bool" label="30430" default="false" enable="eq(-1,true)" />
+	-->
+
+	 <setting id="socket_timeout" type="number" label="30420" default="0"/>
+	 <setting id="http_cache_disable_adv" label="30170" type="bool" default="false" />
+	</category>
 </settings>
