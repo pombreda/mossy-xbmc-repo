@@ -8,7 +8,7 @@ from errorhandler import ErrorCodes
 from errorhandler import ErrorHandler
 
 # Only used if we fail to parse the URL from the website
-__SwfPlayerDefault__ = 'http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.31.1.swf'
+__SwfPlayerDefault__ = 'http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.31.2.swf'
 
 
 def findString(method, pattern, string, flags = (re.DOTALL | re.IGNORECASE)):

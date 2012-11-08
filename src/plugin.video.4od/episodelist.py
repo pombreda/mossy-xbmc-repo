@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 
 import xbmc
@@ -9,6 +10,11 @@ from errorhandler import ErrorHandler
 from geturllib import CacheHelper
 
 import utils
+from xbmcaddon import Addon
+
+__PluginName__  = 'plugin.video.4od'
+__addon__ = Addon(__PluginName__)
+__language__ = __addon__.getLocalizedString
 
 #TODO Add more comprehensive debug logging to this class (EpisodeList)
 #TODO There is much reliance on member variables. Probably many cases 
@@ -47,7 +53,7 @@ class EpisodeList:
 		log ("initialise showId: %s, showTitle: %s " % ( showId, showTitle ), xbmc.LOGDEBUG)
 		(self.html, logLevel) = self.cache.GetURLFromCache( "http://www.channel4.com/programmes/" + showId + "/4od", 600 ) # 10 minutes
 
-		if self.html == '':
+		if self.html is None or self.html == '':
 			error = ErrorHandler('EpisodeList.initialise', ErrorCodes.ERROR_GETTING_EPISODE_LIST, __language__(30800))
 			return error
 
@@ -81,9 +87,20 @@ class EpisodeList:
 		description	= ''
 		epNum		= ''
 		seriesNum	= ''
+		programmeNum = ''
 
 
 		for dataKeyValue in dataKeyValues:
+			if ( dataKeyValue[0].lower() == 'wsprogrammeid' ):
+				try: 
+					programmeString = re.search( '[0-9]*?-([0-9][0-9][0-9])', dataKeyValue[1], re.DOTALL)
+					
+					if programmeString:
+						programmeNum = int(programmeString.group(1))
+				except:
+					pass
+				continue
+
 			if ( dataKeyValue[0].lower() == 'episode-number' ):
 				try: 
 					epNum 	= int(dataKeyValue[1])
@@ -132,7 +149,7 @@ class EpisodeList:
 
 
 		if assetId <> '':
-			log ('Episode details: ' + str((assetId,epNum,url,image,premieredDate,progTitle,epTitle,description,seriesNum)), xbmc.LOGDEBUG)
+			log ('Episode details: ' + str((assetId,epNum,url,image,premieredDate,progTitle,epTitle,description,seriesNum,programmeNum)), xbmc.LOGDEBUG)
 			self.assetId 		= assetId
 			self.epNum 		= epNum
 			self.url 		= url
@@ -142,6 +159,7 @@ class EpisodeList:
 			self.epTitle 		= epTitle
 			self.description	= description
 			self.seriesNum		= seriesNum
+			self.programmeNum		= programmeNum
 
 
 	def refineEpisodeDetails(self):
@@ -165,8 +183,20 @@ class EpisodeList:
 #		xbmc.log( "End2: %s" % str(self.seriesNum), xbmc.LOGDEBUG)
 #		xbmc.log( str(self.epNum), xbmc.LOGDEBUG)
 
+		# Correct inconsistent Come Dine With Me episodes numbers
+		if self.epNum <> "" and self.programmeNum <> "" and self.epNum !=  self.programmeNum:
+			xbmc.log("Different episode and programmes values: %s, %s" % (self.epNum, self.programmeNum), xbmc.LOGERROR)
+			match = re.search('come-dine-with-me/', self.url, re.DOTALL | re.IGNORECASE)
+			if match:
+					self.epNum =  self.programmeNum
+
+
 		if ( self.seriesNum <> "" and self.epNum <> "" ):
-			self.filename = self.showId + ".s%0.2ie%0.2i" % (self.seriesNum, self.epNum)
+			#E.g. NAME.s01e12
+			self.filename = self.showId + ".s%0.2ie%0.3i" % (self.seriesNum, self.epNum)
+		elif ( self.seriesNum <> "" and self.programmeNum <> "" ):
+			#E.g. NAME.s21e224
+			self.filename = self.showId + ".s%0.2ie%0.3i" % (self.seriesNum, self.programmeNum)
 		elif len(self.premieredDate) > 0:
 			self.filename = self.showId + "." + self.premieredDate.replace( ' ', '.' )
 		else:
@@ -189,7 +219,7 @@ class EpisodeList:
 
 		self.description = utils.remove_extra_spaces(utils.remove_html_tags(self.description))
 		self.description = self.description.replace( '&amp;', '&' )
-		self.description=self.description.replace('&pound;','x')
+		self.description=self.description.replace('&pound;','£')
 		self.description = self.description.replace( '&quot;', "'" )
 
 		if (self.image == ""):

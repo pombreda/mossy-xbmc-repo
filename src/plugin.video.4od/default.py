@@ -1,7 +1,8 @@
-#/bin/p__youtube__hon
+#/bin/python
 # -*- coding: utf-8 -*-
 
-# Remove "see previous" from Youtube errors
+# TODO use Beautiful Soup to parse html xml files
+# TODO series//episode/programme numbers are being passed as part of the defaultFilename - do it properly
 import os
 import xbmcplugin
 import xbmcgui
@@ -10,6 +11,8 @@ import re
 import geturllib
 import fourOD_token_decoder
 import mycgi
+
+#import SimpleDownloader
 
 from errorhandler import ErrorCodes
 from errorhandler import ErrorHandler
@@ -33,18 +36,19 @@ __BaseURL__ = sys.argv[0]
 
 __addon__ = Addon(__PluginName__)
 __language__ = __addon__.getLocalizedString
+#__downloader__ = SimpleDownloader.SimpleDownloader()
+__cache__ = CacheHelper()
 
 RESOURCE_PATH = os.path.join( __addon__.getAddonInfo( "path" ), "resources" )
 MEDIA_PATH = os.path.join( RESOURCE_PATH, "media" )
 
 # Use masterprofile rather profile, because we are caching data that may be used by more than one user on the machine
 DATA_FOLDER      = xbmc.translatePath( os.path.join( "special://masterprofile","addon_data", __PluginName__ ) )
-CACHE_FOLDER     = os.path.join( DATA_FOLDER, '__cache__' )
+CACHE_FOLDER     = os.path.join( DATA_FOLDER, 'cache' )
 SUBTITLE_FILE    = os.path.join( DATA_FOLDER, 'subtitle.smi' )
 NO_SUBTITLE_FILE = os.path.join( RESOURCE_PATH, 'nosubtitles.smi' )
 
 
-__cache__ = CacheHelper()
 
 def get_system_platform():
     platform = "unknown"
@@ -64,7 +68,7 @@ __platform__     = get_system_platform()
 
 __youtube__ = youtube.YouTube(__cache__, __platform__)
 
-
+__dict__ = {}
 #==============================================================================
 # ShowCategoriese[p
 #
@@ -101,7 +105,18 @@ def ShowCategories():
 		# 'Cannot show categories'
 		error.process(__language__(30765), '', logLevel)
 		return error
+	
+	###
+	#for categoryInfo in categories:
+	#	ShowCategory(categoryInfo[0], '', '/title', '1')
+	
+	#xbmc.log ("Starting Youtube processing", xbmc.LOGDEBUG)
+	#for showId in __dict__:
+	#	showId = showId.replace( '-', '' )
+	#	urlExists("http://www.youtube.com/show/" + showId)
 		
+	#return
+	###
 	listItems = []
 	# Start with a Search entry	'Search'
 	newListItem = xbmcgui.ListItem( __language__(30500) )
@@ -112,11 +127,36 @@ def ShowCategories():
 		newListItem = xbmcgui.ListItem( label=label )
 		url = __BaseURL__ + '?category=' + mycgi.URLEscape(categoryInfo[0]) + '&title=' + mycgi.URLEscape(label) + '&order=' + mycgi.URLEscape('/title') + '&page=' + mycgi.URLEscape('1')
 		listItems.append( (url,newListItem,True) )
+	
 	xbmcplugin.addDirectoryItems( handle=__PluginHandle__, items=listItems )
 	xbmcplugin.endOfDirectory( handle=__PluginHandle__, succeeded=True )
 		
 	return None
 
+###
+#import urllib2
+#import contextlib
+#def urlExists(url):
+
+#		xbmc.log ( 'Checking if url exists: %s' % url, xbmc.LOGDEBUG )
+#		try:			
+#			req = urllib2.Request(url)
+#			with contextlib.closing(urllib2.urlopen(req)) as res:
+#				newUrl = res.geturl()
+#
+#		except ( urllib2.HTTPError ) as err:
+#			xbmc.log ( 'HTTPError: ' + str(err) + ': ' + url, xbmc.LOGERROR )
+#			return False
+#		except ( urllib2.URLError ) as err:
+#			xbmc.log ( 'URLError: ' + str(err) + ': ' + url, xbmc.LOGERROR)
+#			return False
+#		except ( Exception ) as e:
+#			xbmc.log ( 'Exception: ' + str(e) + ': ' + url, xbmc.LOGERROR )
+#			return False
+#
+#		log('newUrl: %s' % newUrl, xbmc.LOGDEBUG)
+#		return True
+###
 
 #==============================================================================
 # GetThumbnailPath
@@ -213,12 +253,16 @@ def AddPageToListItems( category, label, order, page, listItems ):
 
 	for showInfo in showsInfo:
 		showId = showInfo[0]
+		###
+		#__dict__[showId] = 'yes'
+		#continue
+		###
 		thumbnail = "http://www.channel4.com" + showInfo[1]
 		progTitle = showInfo[2]
 		progTitle = progTitle.replace( '&amp;', '&' )
 		synopsis = showInfo[3].strip()
 		synopsis = synopsis.replace( '&amp;', '&' )
-		synopsis = synopsis.replace( '&pound;', '£' )
+		synopsis = synopsis.replace( '&pound;', 'Â£' )
 		
 		newListItem = xbmcgui.ListItem( progTitle )
 		newListItem.setThumbnailImage(thumbnail)
@@ -239,6 +283,8 @@ def AddPageToListItems( category, label, order, page, listItems ):
 
 
 def ShowCategory( category, label, order, page ):
+	log('ShowCategory(%s)' % str(( category, label, order, page)), xbmc.LOGDEBUG)
+
 	listItems = []
 
 	pageInt = int(page)
@@ -251,6 +297,9 @@ def ShowCategory( category, label, order, page ):
 
 	paging = __addon__.getSetting( 'paging' )
 
+	###
+	#paging = 'false'
+	###
 	if (paging == 'true'):
 		if pageInt > 1:
 			AddPageLink(category, order, True, str(pageInt - 1), listItems)
@@ -259,8 +308,8 @@ def ShowCategory( category, label, order, page ):
 		if isinstance(nextUrl, ErrorHandler):
 			error = nextUrl
 			# 'Cannot show category', 'Error processing web page'
-			error.process(__language__(30785), __language__(30780), xbmc.LOGERROR)
-			return		
+			error.process(__language__(30785), __language__(30780), __cache__.ifCacheLevel(xbmc.LOGERROR))
+			return error	
 
 		if (nextUrl.lower() <> 'endofresults'):
 			nextPage = str(pageInt + 1)
@@ -273,8 +322,8 @@ def ShowCategory( category, label, order, page ):
 			if isinstance(nextUrl, ErrorHandler):
 				error = nextUrl
 				# 'Cannot show category', 'Error processing web page'
-				error.process(__language__(30785), __language__(30780), xbmc.LOGERROR)
-				return		
+				error.process(__language__(30785), __language__(30780), __cache__.ifCacheLevel(xbmc.LOGERROR))
+				return error		
 
 			pageInt = pageInt + 1
 			page = str(pageInt)
@@ -284,17 +333,19 @@ def ShowCategory( category, label, order, page ):
 	xbmcplugin.setContent(handle=__PluginHandle__, content='tvshows')
 	xbmcplugin.endOfDirectory( handle=__PluginHandle__, succeeded=True )
 
+	return None
 
 #==============================================================================
 
 def ShowEpisodes( showId, showTitle ):
+	log('ShowEpisodes: ' + str(( showId, showTitle )), xbmc.LOGDEBUG)
 	episodeList = EpisodeList(__BaseURL__, __cache__)
 
 	error = episodeList.initialise(showId, showTitle)
 	if error is not None:
 		# "Error parsing html", "Cannot list episodes."
-		error.process(__language__(30735), __language__(30740), xbmc.LOGERROR)
-		return
+		error.process(__language__(30735), __language__(30740), __cache__.ifCacheLevel(xbmc.LOGERROR))
+		return error
 
 	listItems = episodeList.createListItems(mycgi)
 
@@ -302,6 +353,7 @@ def ShowEpisodes( showId, showTitle ):
 	xbmcplugin.setContent(handle=__PluginHandle__, content='episodes')
 	xbmcplugin.endOfDirectory( handle=__PluginHandle__, succeeded=True )
 
+	return None
 #==============================================================================
 
 def SetSubtitles(episodeId, filename = None):
@@ -329,7 +381,7 @@ def SetSubtitles(episodeId, filename = None):
 		subtitle = subtitle.replace( '&quot;', '"')
 		subtitle = subtitle.replace( '&apos;', "'")
 		subtitle = subtitle.replace( '&amp;', '&' )
-		subtitle = subtitle.replace( '&pound;', '£' )
+		subtitle = subtitle.replace( '&pound;', 'Â£' )
 		subtitle = subtitle.replace( '&lt;', '<' )
 		subtitle = subtitle.replace( '&gt;', '>' )
 
@@ -350,7 +402,7 @@ def GetDownloadSettings(defaultFilename):
 		# Download Error - You have not located your rtmpdump executable...
 		dialog.ok(__language__(30560),__language__(30570),'','')
 		__addon__.openSettings(sys.argv[ 0 ])
-
+	
 		rtmpdumpPath = __addon__.getSetting('rtmpdump_path')
 		if ( rtmpdumpPath is '' ):
 			return
@@ -388,6 +440,7 @@ def GetDownloadSettings(defaultFilename):
 		if ( downloadFolder == '' ):
 			return
 
+	#return (downloadFolder, filename)
 	return (rtmpdumpPath, downloadFolder, filename)
 
 #==============================================================================
@@ -397,10 +450,10 @@ def GetDownloadSettings(defaultFilename):
 #==============================================================================
 
 def Play(playURL, showId, episodeId, title):
-	log ('Play showId: ' + showId)
-	log ('Play episodeId: ' + episodeId)
-	log ('Play titleId: ' + title)
-	log ('Play url: ' + playURL)
+	log ('Play showId: ' + str(showId))
+	log ('Play episodeId: ' + str(episodeId))
+	log ('Play titleId: ' + str(title))
+	log ('Play url: ' + str(playURL))
 
 	episodeList = EpisodeList(__BaseURL__, __cache__)
 	error = episodeList.initialise(showId, title)
@@ -434,6 +487,7 @@ def Download(rtmpvar, youtubeId, episodeId, defaultFilename):
 
 def DownloadRTMP(rtmpvar, episodeId, defaultFilename):
 	(rtmpdumpPath, downloadFolder, filename) = GetDownloadSettings(defaultFilename)
+	#(downloadFolder, filename) = GetDownloadSettings(defaultFilename)
 	
 	savePath = os.path.join( downloadFolder, filename )
 
@@ -445,9 +499,22 @@ def DownloadRTMP(rtmpvar, episodeId, defaultFilename):
                 SetSubtitles(episodeId, savePath[0:-4] + '.smi')
 
 	rtmpvar.setDownloadDetails(rtmpdumpPath, savePath)
-
 	parameters = rtmpvar.getParameters()
+	#rtmpvar.setDownloadPath(savePath)
+	#log ("Starting download: " +  str(parameters))#
 
+        #params =  { 
+	#	"download_path": downloadFolder,
+	#	"url": rtmpvar.url,
+	#	"app": rtmpvar.app,
+	#	"auth": rtmpvar.auth,
+        #         "flashVer": "WIN 11,2,202,243",
+	#	 "conn": "Z:", 
+	#	 "playpath": rtmpvar.playPath }
+
+	#log ("Starting download: " + filename + " " + str(params))
+	#log ("Download would be: " + os.path.join(params["download_path"].decode("utf-8"), filename))
+        #__downloader__.download(filename, params)
 	from subprocess import Popen, PIPE, STDOUT
 		
 	# Starting download
@@ -508,7 +575,7 @@ def GetAuthentication(uriData):
 		else:
 			auth = "e=%s&h=%s" % (e,decodedToken)
 	else:
-		return ErrorHandler('GetStreamInfo', ErrorCodes.WRONG_CONTENT_DELIVERY_NETWORK, __language__(30950) )
+		return ErrorHandler('GetAuthentication', ErrorCodes.WRONG_CONTENT_DELIVERY_NETWORK, __language__(30950) )
 #		(fingerprint, error) = utils.findString('GetAuthentication', '<fingerprint>(.*?)</fingerprint>', uriData)
 #		if error is not None:
 #			return error
@@ -621,11 +688,12 @@ def InitialiseRTMP(episodeId, swfPlayer):
 def getYoutubeUrl(showId, defaultFilename, logLevel):
 	(youtubeId, errorYoutube) = __youtube__.getYoutubeId(showId, defaultFilename)
 
-	log ('PlayOrDownloadEpisode: youtubeId, error: %s, %s' % (str(youtubeId), str(errorYoutube)))
+	log ('getYoutubeUrl: youtubeId, error: %s, %s' % (str(youtubeId), str(errorYoutube)))
 
 	if errorYoutube is None:
 		playUrl = __youtube__.getYoutubeUrlFromId(youtubeId)
 	else:
+		playUrl = None
 		# Error streaming video from Youtube, It's possible that this programme is not available from 4od on Youtube (e.g. all US shows) or is not avilable on Youtube yet
 		errorYoutube.process(__language__(30850), __language__(30855), logLevel)
 
@@ -664,8 +732,9 @@ def getRTMPUrl(showId, episodeId, defaultFilename, swfPlayer, dialog):
 				if errorYoutube is not None:
 					errorRtmp.messageSummary = errorRtmp.messageSummary + ' - ' + errorYoutube.messageSummary
 
+			
 			# 'Error parsing stream info', 'Cannot proceed (also unable to stream video from Youtube, see previous log msg)'
-			errorRtmp.process(__language__(30750), message, xbmc.LOGERROR)
+			errorRtmp.process(__language__(30750), message, __cache__.ifCacheLevel(xbmc.LOGERROR))
 		else:
 			log("playUrl is not None", xbmc.LOGERROR)
 			# Log rtmp error
@@ -702,9 +771,15 @@ def PlayOrDownloadEpisode( showId, episodeId, title, defaultFilename, swfPlayer 
 	(youtubeId, playUrl, rtmpvar) = getRTMPUrl(showId.lower(), episodeId, defaultFilename, swfPlayer, dialog)
 
 	if dialog.iscanceled():
-		return
+		return None
 
 	dialog.close()
+
+	log ('PlayOrDownloadEpisode: youtubeId, error: %s, %s' % (str(youtubeId), str(rtmpvar)))
+
+	# If we can't get Youtube OR rtmp then don't do anything
+	if youtubeId is None and isinstance(rtmpvar, ErrorHandler):
+		return rtmpvar
 
 	action = GetAction(title)
 
@@ -732,7 +807,7 @@ def PlayOrDownloadEpisode( showId, episodeId, title, defaultFilename, swfPlayer 
 #			__youtube__.checkVersion()
 #
 #	log('After Play/Download', xbmc.LOGDEBUG)
-	return
+	return None
 
 #==============================================================================
 
@@ -763,7 +838,7 @@ def DoSearchQuery( query ):
 		progUrl  = info[2]
 		
 		title = title.replace( '&amp;', '&' )
-		title = title.replace( '&pound;', '£' )
+		title = title.replace( '&pound;', 'Â£' )
 		title = title.replace( '&quot;', "'" )
 		
 		image = "http://www.channel4.com" + image
@@ -783,7 +858,8 @@ def DoSearchQuery( query ):
 	xbmcplugin.addDirectoryItems( handle=__PluginHandle__, items=listItems )
 	xbmcplugin.setContent(handle=__PluginHandle__, content='tvshows')
 	xbmcplugin.endOfDirectory( handle=__PluginHandle__, succeeded=True )
-                                      
+	
+	return None
 
 #==============================================================================
 
@@ -824,7 +900,7 @@ def executeCommand():
 if __name__ == "__main__":
 
 	try:
-        	if __addon__.getSetting('http___cache___disable_adv') == 'false':
+        	if __addon__.getSetting('http_cache_disable_adv') == 'false':
 			geturllib.SetCacheDir( CACHE_FOLDER )
 
 		InitTimeout()
@@ -836,7 +912,9 @@ if __name__ == "__main__":
 		__cache__.setCacheAttempt(True)
 		error = executeCommand()			
 
-		if error is not None and __cache__.getCacheAttempt() == True:
+		xbmc.log("Error: %s, getGotFromCache(): %s" % (str(error), str(__cache__.getGotFromCache())), xbmc.LOGDEBUG)
+		
+		if error is not None and __cache__.getGotFromCache() == True:
 			__cache__.setCacheAttempt(False)
 			error = executeCommand()			
 

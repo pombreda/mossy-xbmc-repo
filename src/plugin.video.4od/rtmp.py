@@ -58,12 +58,13 @@ class RTMP:
 
 		return None
 
+	#def setDownloadPath(self, savePath):
+	#	self.savePath = savePath
 	def setDownloadDetails(self, rtmpdumpPath, savePath):
                 self.rtmpdumpPath = rtmpdumpPath
-                self.savePath = savePath
+		self.savePath = savePath
 	
 		log ("setDownloadDetails rtmpdumpPath: " + self.rtmpdumpPath, xbmc.LOGDEBUG)
-		log ("setDownloadDetails savePath: " + self.savePath, xbmc.LOGDEBUG)
 
 
 	def getParameters(self):

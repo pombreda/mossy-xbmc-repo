@@ -23,6 +23,9 @@ __YoutubeAddon__ = Addon(__YoutubePluginName__)
 
 DATA_FOLDER  		= xbmc.translatePath( os.path.join( "special://masterprofile","addon_data", __PluginName__ ) )
 YOUTUBE_CHECK_FILE     	= os.path.join( DATA_FOLDER, 'YoutubeCheck' )
+TITLECHANGES_PATH = os.path.join( __addon__.getAddonInfo( "path" ), "titlechanges.txt" )
+
+
 
 class YouTube:
 	def __init__(self, cache, platform):
@@ -30,6 +33,12 @@ class YouTube:
 		self.platform = platform
 		self.installed = False
 
+		self.titleChanges = {}
+		with open(TITLECHANGES_PATH) as f:
+			for line in f:
+				if len(line) > 0:
+					(key, val) = line.split(',')
+					self.titleChanges[key] = val
 
 	def urlExists(self, url):
 
@@ -125,10 +134,10 @@ class YouTube:
 			log (__language__(30900) + youtubeId, logLevel)
 			return False
 
-		(episodeCandidate, error) = utils.findString('verifyYoutubePage', 'Season %s Ep\. ([0-9]+?)' % seriesTarget, episodePage)
+		(episodeCandidate, error) = utils.findString('verifyYoutubePage', 'Season %s Ep\. ([0-9]+)' % seriesTarget, episodePage)
 
 		# episodeCandidate: 
-		log (__language__(30905) + episodeCandidate, logLevel)
+		log (__language__(30905) + str(episodeCandidate), logLevel)
 
 		if episodeCandidate is not None and int(episodeCandidate) == episodeTarget:
 			return True
@@ -163,7 +172,16 @@ class YouTube:
 		log ('videoFromPlaylist: youtubeId, error: %s, %s' % (str(youtubeId), str(error)))
 		return (None, error)	
 	
-
+	# Workaround for incorrectly formed Youtube show URLs
+	def getShowURL(self, title):
+		if title == 'gordonbehindbars':
+			return "http://www.youtube.com/channel/SWR_nf_mWkeWs"
+		elif title == 'lifers':
+			return "http://www.youtube.com/channel/SW2VCLcwGuST4"
+		
+		return  "http://www.youtube.com/show/%s" % title
+	
+		
 	def getYoutubeId(self, title, defaultFilename):
 		# Searching Youtube...
 		log (__language__(30910), xbmc.LOGWARNING)
@@ -171,17 +189,17 @@ class YouTube:
 		youtubeId = None
 		title = title.replace( '-', '' )
 
-		match = re.search('s([0-9][0-9])e([0-9][0-9])', defaultFilename)
+		if title in self.titleChanges:
+			log('Change title from "%s" to "%s" for Youtube processing' % (title, self.titleChanges[title]), xbmc.LOGDEBUG)
+			title = self.titleChanges[title]
+			
+		match = re.search('s([0-9][0-9])e([0-9][0-9]+)', defaultFilename, re.DOTALL)
 		if match:
 			seriesNumber = int(match.group(1))
 			episodeNumber = int(match.group(2))
+			log ('seriesNumber, episodeNumber: %s, %s, ' % (str(seriesNumber), str(episodeNumber)), xbmc.LOGDEBUG)
 
-			# getYoutubeUrl seriesNumber: 
-			# getYoutubeUrl episodeNumber: 	 
-			log (__language__(30915) + str(seriesNumber), xbmc.LOGDEBUG)
-			log (__language__(30920) + str(episodeNumber), xbmc.LOGDEBUG)
-
-			(tubeShow, logLevel) = self.cache.GetURLFromCache( "http://www.youtube.com/show/%s" % title, 600 )
+			(tubeShow, logLevel) = self.cache.GetURLFromCache( self.getShowURL(title), 600 )
 		
 			if tubeShow is None or tubeShow == '':
 				error = ErrorHandler('getYoutubeId', ErrorCodes.ERROR_GETTING_YOUTUBE_SHOW, '')
@@ -196,7 +214,7 @@ class YouTube:
 					error = ErrorHandler('getYoutubeId', ErrorCodes.ERROR_GETTING_YOUTUBE_SEASON, '')
 					return ( None, error )
 
-				log ('seriesNumber, episodeNumber: %s, %s' % (str(seriesNumber), str(episodeNumber)), xbmc.LOGDEBUG)
+				#log ('seriesNumber, episodeNumber: %s, %s' % (str(seriesNumber), str(episodeNumber)), xbmc.LOGDEBUG)
 
 				(youtubeId, error) = self.videoFromPlaylist(tubeSeasonPlaylist, seriesNumber, episodeNumber)
 				log ('youtubeId, error: %s, %s' % (str(youtubeId), str(error)))

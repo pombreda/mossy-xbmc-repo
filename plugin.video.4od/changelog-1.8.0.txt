@@ -1,11 +1,11 @@
-Version 1.6.0 (05 Nov 2012)
-- Workaround for the "No MP4 found" problem, automatically uses 4od's Youtube channels for videos that fail to play. Only works for Ch4 made programmes, so still no US shows.
+Version 1.8.0 (05 Nov 2012)
+- Workaround for the "No MP4 found" problem, automatically uses 4od's Youtube channels for videos that fail to play. Only works for Ch4 made programmes, so still no US shows, and only for shows that 4oD put on Youtube.
 
-- Added socket timeout handling
+- Added socket timeout handling. You can now set the socket timeout in the plugin settings
 
-- Improved cache handling - if an eerror occurrs processing data from the cache, a fresh copy of the same data is taken from the web and that is processed instead
+- Improved cache handling - if an error occur. You can now set the socket timeout in the plugin settingss processing data from the cache, a fresh copy of the same data is taken from the web and that is processed instead
 
-- Added more debug loggin
+- Added more debug logging
 
 
 The 4od plugin uses the Youtube plugin to play recent 4od programmes from Youtube. If you don't have the Youtube plugin installed the Youtube plugin should automatically install when the 4od plugin first tries to use it.
