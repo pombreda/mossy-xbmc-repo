@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 # TODO use Beautiful Soup to parse html xml files
-# TODO series//episode/programme numbers are being passed as part of the defaultFilename - do it properly
 import os
 import xbmcplugin
 import xbmcgui
@@ -347,7 +346,7 @@ def ShowEpisodes( showId, showTitle ):
 		error.process(__language__(30735), __language__(30740), __cache__.ifCacheLevel(xbmc.LOGERROR))
 		return error
 
-	listItems = episodeList.createListItems(mycgi)
+	listItems = episodeList.createListItems(mycgi, __youtube__)
 
 	xbmcplugin.addDirectoryItems( handle=__PluginHandle__, items=listItems )
 	xbmcplugin.setContent(handle=__PluginHandle__, content='episodes')
@@ -685,22 +684,18 @@ def InitialiseRTMP(episodeId, swfPlayer):
 	return rtmpvar
 
 #==============================================================================
-def getYoutubeUrl(showId, defaultFilename, logLevel):
-	(youtubeId, errorYoutube) = __youtube__.getYoutubeId(showId, defaultFilename)
 
-	log ('getYoutubeUrl: youtubeId, error: %s, %s' % (str(youtubeId), str(errorYoutube)))
-
-	if errorYoutube is None:
-		playUrl = __youtube__.getYoutubeUrlFromId(youtubeId)
-	else:
-		playUrl = None
-		# Error streaming video from Youtube, It's possible that this programme is not available from 4od on Youtube (e.g. all US shows) or is not avilable on Youtube yet
-		errorYoutube.process(__language__(30850), __language__(30855), logLevel)
-
-	return (youtubeId, playUrl, errorYoutube)
+def getDefaultFilename(showId, seriesNumber, episodeNumber):
+	if ( seriesNumber <> "" and episodeNumber <> "" ):
+		#E.g. NAME.s01e12
+		return showId + ".s%0.2ie%0.3i" % (int(seriesNumber), int(episodeNumber))
+	
+	return showId
 
 
-def getRTMPUrl(showId, episodeId, defaultFilename, swfPlayer, dialog):
+#==============================================================================
+
+def getRTMPUrl(showId, seriesNumber, episodeNumber, episodeId, swfPlayer, dialog):
 	playUrl = None
 	youtubeId = None
 
@@ -711,12 +706,8 @@ def getRTMPUrl(showId, episodeId, defaultFilename, swfPlayer, dialog):
 
 		# 'Looking for video on Youtube'
 		if __addon__.getSetting( 'youtube_enable' ):
-			# Check if youtube installed, version
-			# If version is "3.2.0" show msg: Go here to get working version
-			# If not installed wait until after play/download, do same check and msg show same msg.
-			__youtube__.checkVersion()
 			dialog.update(50, __language__(30890))
-			(youtubeId, playUrl, errorYoutube) = getYoutubeUrl(showId, defaultFilename, xbmc.LOGDEBUG)
+			(youtubeId, playUrl, errorYoutube) = __youtube__.getYoutubeUrl(showId, seriesNumber, episodeNumber, xbmc.LOGDEBUG)
 
 		# Indicates that either youtube is not enabled, or we failed to get the youtube url
 		if playUrl is None:
@@ -736,7 +727,7 @@ def getRTMPUrl(showId, episodeId, defaultFilename, swfPlayer, dialog):
 			# 'Error parsing stream info', 'Cannot proceed (also unable to stream video from Youtube, see previous log msg)'
 			errorRtmp.process(__language__(30750), message, __cache__.ifCacheLevel(xbmc.LOGERROR))
 		else:
-			log("playUrl is not None", xbmc.LOGERROR)
+			log("playUrl is not None")
 			# Log rtmp error
 			# 'Cannot proceed'
 			message = __language__(30755)
@@ -753,7 +744,7 @@ def getRTMPUrl(showId, episodeId, defaultFilename, swfPlayer, dialog):
 
 	return (youtubeId, playUrl, rtmpvar)
 
-def PlayOrDownloadEpisode( showId, episodeId, title, defaultFilename, swfPlayer ):
+def PlayOrDownloadEpisode( showId, seriesNumber, episodeNumber, episodeId, title, swfPlayer ):
 	log ('PlayOrDownloadEpisode showId: ' + showId, xbmc.LOGDEBUG)
 	log ('PlayOrDownloadEpisode episodeId: ' + episodeId, xbmc.LOGDEBUG)
 	log ('PlayOrDownloadEpisode title: ' + title, xbmc.LOGDEBUG)
@@ -768,7 +759,7 @@ def PlayOrDownloadEpisode( showId, episodeId, title, defaultFilename, swfPlayer 
 
 	# 'Looking for video on 4od'
 	dialog.update(0,  __language__(30885))
-	(youtubeId, playUrl, rtmpvar) = getRTMPUrl(showId.lower(), episodeId, defaultFilename, swfPlayer, dialog)
+	(youtubeId, playUrl, rtmpvar) = getRTMPUrl(showId.lower(), seriesNumber, episodeNumber, episodeId, swfPlayer, dialog)
 
 	if dialog.iscanceled():
 		return None
@@ -783,8 +774,6 @@ def PlayOrDownloadEpisode( showId, episodeId, title, defaultFilename, swfPlayer 
 
 	action = GetAction(title)
 
-#	installedBefore = __youtube__.checkInstalled()
-
 	if ( action == 1 ):
 		# Play
 		Play(playUrl, showId, episodeId, title)
@@ -793,20 +782,11 @@ def PlayOrDownloadEpisode( showId, episodeId, title, defaultFilename, swfPlayer 
 		if ( action == 0 ):
 			# Download
 			if youtubeId is None:
+				defaultFilename = getDefaultFilename(showId, seriesNumber, episodeNumber)
 				Download(rtmpvar, youtubeId, episodeId, defaultFilename)
 			else:
 				__youtube__.downloadFromYoutube(youtubeId)
 
-#	if not installedBefore:
-#		log('Not installed before', xbmc.LOGDEBUG)
-#		xbmc.executebuiltin('UpdateLocalAddons')
-#		installedAfter = __youtube__.checkInstalled()
-#
-#		if installedAfter:
-#			log('Installed before', xbmc.LOGDEBUG)
-#			__youtube__.checkVersion()
-#
-#	log('After Play/Download', xbmc.LOGDEBUG)
 	return None
 
 #==============================================================================
@@ -883,7 +863,7 @@ def executeCommand():
 	if ( mycgi.EmptyQS() ):
 		error = ShowCategories()
 	else:
-		(category, showId, episodeId, title, search, swfPlayer, order, page) = mycgi.Params( 'category', 'show', 'ep', 'title', 'search', 'swfPlayer', 'order', 'page' )
+		(category, showId, episodeId, title, search, order, page) = mycgi.Params( 'category', 'show', 'ep', 'title', 'search', 'order', 'page' )
 
 		if ( search <> '' ):
 			error = DoSearch()
@@ -892,7 +872,8 @@ def executeCommand():
 		elif ( category <> '' ):
 			error = ShowCategory( category, title, order, page )
 		elif ( episodeId <> '' ):
-			error = PlayOrDownloadEpisode( showId, episodeId, title, mycgi.Param('fn'), swfPlayer )
+			(episodeNumber, seriesNumber, swfPlayer) = mycgi.Params( 'episodeNumber', 'seriesNumber', 'swfPlayer' )
+			error = PlayOrDownloadEpisode( showId, int(seriesNumber), int(episodeNumber), episodeId, title, swfPlayer )
 	
 	return error
 

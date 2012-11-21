@@ -40,76 +40,6 @@ class YouTube:
 					(key, val) = line.split(',')
 					self.titleChanges[key] = val
 
-	def urlExists(self, url):
-
-		xbmc.log ( 'Checking if url exists: %s' % url, xbmc.LOGDEBUG )
-		try:			
-			req = urllib2.Request(url)
-			with contextlib.closing(urllib2.urlopen(req)) as res:
-				newUrl = res.geturl()
-
-		except ( urllib2.HTTPError ) as err:
-			xbmc.log ( 'HTTPError: ' + str(err), xbmc.LOGDEBUG )
-			return False
-		except ( urllib2.URLError ) as err:
-			xbmc.log ( 'URLError: ' + str(err), xbmc.LOGDEBUG )
-			return False
-		except ( Exception ) as e:
-			xbmc.log ( 'Exception: ' + str(e), xbmc.LOGDEBUG )
-			return False
-
-		log('newUrl: %s' % newUrl, xbmc.LOGDEBUG)
-		return True
-
-	def checkInstalled(self):
-		pluginId = __YoutubeAddon__.getAddonInfo( 'id' )
-
-		log('pluginId: %s' % pluginId, xbmc.LOGDEBUG)
-		if pluginId == 'plugin.video.4od':
-			log('Youtube plugin not installed', xbmc.LOGDEBUG)
-			self.installed = False
-		else:
-			log('Youtube plugin installed', xbmc.LOGDEBUG)
-			self.installed = True
-
-		return self.installed
-	
-	# Horrible kludge to get around Youtube problems
-	# This is a temporary measure, strings will be hardcoded until this mess is removed.
-	def showVersionMessage(self):
-		dialog = xbmcgui.Dialog()
-		dialog.ok('Youtube plugin has errors', 'The current version of the Youtube plugin won\'t work',  'with some 4od videos without changes', 'See here for more information: http://goo.gl/rA1CS')
-
-	def checkVersion(self):
-		log('Checking Youtube', xbmc.LOGDEBUG)
-
-		if not self.checkInstalled():
-			# Check build version, if Eden check youtube plugin version, if 3.2.0 show msg
-			buildVersion = xbmc.getInfoLabel( "System.BuildVersion" )
-			log("BuildVersion: %s" % buildVersion, xbmc.LOGDEBUG)
-
-			if buildVersion.startswith("11."):
-				log("buildVersion.startswith(\"11.\")", xbmc.LOGDEBUG)
-				if self.urlExists('http://mirrors.xbmc.org/addons/eden/plugin.video.youtube/plugin.video.youtube-3.2.0.zip'):
-					log("urlExists", xbmc.LOGDEBUG)
-					self.showVersionMessage()
-			return
-
-		if os.path.exists(YOUTUBE_CHECK_FILE):
-			log('Youtube check file exists', xbmc.LOGDEBUG)
-			return
-
-		log('Youtube check file does not exist', xbmc.LOGDEBUG)
-		file = open(YOUTUBE_CHECK_FILE, 'w')
-		file.write('')
-		file.close()
-		
-		youtubeVersion = __YoutubeAddon__.getAddonInfo('version')
-
-		log('youtubeVersion: %s' % youtubeVersion, xbmc.LOGDEBUG)
-		if youtubeVersion == '3.2.0':
-			self.showVersionMessage()
-
 	def getYoutubeUrlFromId(self, youtubeId):
 		if 'xbox' == self.platform:
 		  url = "plugin://video/YouTube/?path=/root/video&action=play_video&videoid=" + youtubeId
@@ -137,7 +67,7 @@ class YouTube:
 		(episodeCandidate, error) = utils.findString('verifyYoutubePage', 'Season %s Ep\. ([0-9]+)' % seriesTarget, episodePage)
 
 		# episodeCandidate: 
-		log (__language__(30905) + str(episodeCandidate), logLevel)
+		log (__language__(30905) + str(episodeCandidate), xbmc.LOGDEBUG)
 
 		if episodeCandidate is not None and int(episodeCandidate) == episodeTarget:
 			return True
@@ -182,7 +112,7 @@ class YouTube:
 		return  "http://www.youtube.com/show/%s" % title
 	
 		
-	def getYoutubeId(self, title, defaultFilename):
+	def getYoutubeId(self, title, seriesNumber, episodeNumber):
 		# Searching Youtube...
 		log (__language__(30910), xbmc.LOGWARNING)
 
@@ -193,10 +123,7 @@ class YouTube:
 			log('Change title from "%s" to "%s" for Youtube processing' % (title, self.titleChanges[title]), xbmc.LOGDEBUG)
 			title = self.titleChanges[title]
 			
-		match = re.search('s([0-9][0-9])e([0-9][0-9]+)', defaultFilename, re.DOTALL)
-		if match:
-			seriesNumber = int(match.group(1))
-			episodeNumber = int(match.group(2))
+		if seriesNumber <> '' and episodeNumber <> '':
 			log ('seriesNumber, episodeNumber: %s, %s, ' % (str(seriesNumber), str(episodeNumber)), xbmc.LOGDEBUG)
 
 			(tubeShow, logLevel) = self.cache.GetURLFromCache( self.getShowURL(title), 600 )
@@ -222,9 +149,24 @@ class YouTube:
 
 		else:
 			# defaultFilename: 
-			error = ErrorHandler('getYoutubeId', ErrorCodes.CANNOT_DETERMINE_SHOW_NUMBERS, __language__(30925) + defaultFilename )
+			error = ErrorHandler('getYoutubeId', ErrorCodes.CANNOT_DETERMINE_SHOW_NUMBERS, __language__(30925) )
 
 
 		return (youtubeId, error)
+
+
+	def getYoutubeUrl(self, showId, seriesNumber, episodeNumber, logLevel):
+		(youtubeId, errorYoutube) = self.getYoutubeId(showId, seriesNumber, episodeNumber)
+
+		log ('getYoutubeUrl: youtubeId, error: %s, %s' % (str(youtubeId), str(errorYoutube)))
+
+		if errorYoutube is None:
+			playUrl = self.getYoutubeUrlFromId(youtubeId)
+		else:
+			playUrl = None
+			# Error streaming video from Youtube, It's possible that this programme is not available from 4od on Youtube (e.g. all US shows) or is not avilable on Youtube yet
+			errorYoutube.process(__language__(30850), __language__(30855), logLevel)
+
+		return (youtubeId, playUrl, errorYoutube)
 
 

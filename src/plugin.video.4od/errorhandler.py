@@ -26,6 +26,7 @@ class ErrorCodes:
 	WRONG_CONTENT_DELIVERY_NETWORK	= 30945 # Wrong content delivery network
 
 # TODO Rename. variables are too similar in meaning: Summary, Heading, Overview
+# TODO Replace with try/catches
 class ErrorHandler:
 
 	def __init__(self, method, errorCode, messageLog = None, messageHeading = 'Error'):

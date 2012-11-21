@@ -191,16 +191,13 @@ class EpisodeList:
 					self.epNum =  self.programmeNum
 
 
-		if ( self.seriesNum <> "" and self.epNum <> "" ):
-			#E.g. NAME.s01e12
-			self.filename = self.showId + ".s%0.2ie%0.3i" % (self.seriesNum, self.epNum)
-		elif ( self.seriesNum <> "" and self.programmeNum <> "" ):
-			#E.g. NAME.s21e224
-			self.filename = self.showId + ".s%0.2ie%0.3i" % (self.seriesNum, self.programmeNum)
-		elif len(self.premieredDate) > 0:
-			self.filename = self.showId + "." + self.premieredDate.replace( ' ', '.' )
-		else:
-			self.filename = self.showId + "." + self.assetId
+		if ( self.epNum == "" ):
+			self.epNum = self.programmeNum
+
+		#elif len(self.premieredDate) > 0:
+		#	self.filename = self.showId + "." + self.premieredDate.replace( ' ', '.' )
+		#else:
+		#	self.filename = self.showId + "." + self.assetId
 
 		self.progTitle = self.progTitle.strip()
 		self.progTitle = self.progTitle.replace( '&amp;', '&' )
@@ -219,7 +216,7 @@ class EpisodeList:
 
 		self.description = utils.remove_extra_spaces(utils.remove_html_tags(self.description))
 		self.description = self.description.replace( '&amp;', '&' )
-		self.description=self.description.replace('&pound;','£')
+		self.description = self.description.replace( '&pound;', '£')
 		self.description = self.description.replace( '&quot;', "'" )
 
 		if (self.image == ""):
@@ -252,11 +249,12 @@ class EpisodeList:
 	#
 	# Create an XBMC list item for each episode
 	#==============================================================================
-	def createListItems(self, mycgi):
+	def createListItems(self, mycgi, youtube):
 		
 	        listItems = []
 	        epsDict = dict()
 
+		firstItem = True
 	        for listItemHtml in self.listItemsHtml:
 	                self.getEpisodeDetails(listItemHtml)
 
@@ -269,9 +267,16 @@ class EpisodeList:
         	        epsDict[self.assetId] = 1
 
 			self.refineEpisodeDetails()
+
+			if firstItem == True:
+				firstItem = False
+				(youtubeId, errorYoutube) = youtube.getYoutubeId(self.showId, self.seriesNum, self.epNum)
+				if youtubeId is None:
+					self.label = '[Not on Youtube] ' + self.label
                 
 	                newListItem = self.createNewListItem( )
-	                url = self.baseURL + '?ep=' + mycgi.URLEscape(self.assetId) + "&show=" + mycgi.URLEscape(self.showId) + "&title=" + mycgi.URLEscape(self.label) + "&fn=" + mycgi.URLEscape(self.filename) + "&swfPlayer=" + mycgi.URLEscape(self.swfPlayer)
+	                #url = self.baseURL + '?ep=' + mycgi.URLEscape(self.assetId) + "&show=" + mycgi.URLEscape(self.showId) + "&title=" + mycgi.URLEscape(self.label) + "&fn=" + mycgi.URLEscape(self.filename) + "&swfPlayer=" + mycgi.URLEscape(self.swfPlayer)
+			url = self.baseURL + '?ep=' + mycgi.URLEscape(self.assetId) + "&show=" + mycgi.URLEscape(self.showId) + "&seriesNumber=" + mycgi.URLEscape(str(self.seriesNum)) + "&episodeNumber=" + mycgi.URLEscape(str(self.epNum)) + "&title=" + mycgi.URLEscape(self.label) + "&swfPlayer=" + mycgi.URLEscape(self.swfPlayer)
 
 	                listItems.append( (url,newListItem,False) )
 
