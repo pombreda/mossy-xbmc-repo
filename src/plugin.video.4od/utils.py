@@ -1,6 +1,8 @@
 import re
 import urllib2
 
+from time import mktime,strptime
+
 import xbmc
 from xbmc import log
 
@@ -9,7 +11,23 @@ from errorhandler import ErrorHandler
 
 # Only used if we fail to parse the URL from the website
 __SwfPlayerDefault__ = 'http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.31.2.swf'
+__Aug12__ = mktime(strptime("12 Aug 2012", "%d %b %Y"))
 
+# Return true if date is later than 12 Aug 2012
+def isRecentDate(dateString):
+	try:
+		dateCompare = mktime(strptime(dateString, "%d %b %Y"))
+
+		if dateCompare > __Aug12__:
+			return True
+
+	except ( Exception ) as e:
+		if dateString is None:
+			dateString = 'None'
+
+		xbmc.log ( 'Exception: ' + str(e) + ', dateString: ' + str(dateString), xbmc.LOGERROR )
+
+	return False
 
 def findString(method, pattern, string, flags = (re.DOTALL | re.IGNORECASE)):
 	match = re.search( pattern, string, flags )

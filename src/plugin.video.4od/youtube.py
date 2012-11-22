@@ -18,9 +18,6 @@ from xbmcaddon import Addon
 __addon__ = Addon(__PluginName__)
 __language__ = __addon__.getLocalizedString
 
-__YoutubePluginName__ = 'plugin.video.youtube'
-__YoutubeAddon__ = Addon(__YoutubePluginName__)
-
 DATA_FOLDER  		= xbmc.translatePath( os.path.join( "special://masterprofile","addon_data", __PluginName__ ) )
 YOUTUBE_CHECK_FILE     	= os.path.join( DATA_FOLDER, 'YoutubeCheck' )
 TITLECHANGES_PATH = os.path.join( __addon__.getAddonInfo( "path" ), "titlechanges.txt" )
@@ -168,5 +165,51 @@ class YouTube:
 			errorYoutube.process(__language__(30850), __language__(30855), logLevel)
 
 		return (youtubeId, playUrl, errorYoutube)
+
+	#==============================================================================
+	# isNotOnYoutube
+	#
+	# Decide whether or not to prefix title with '[Not on Youtube]'
+	#==============================================================================
+	def isNotOnYoutube(self, episodeIndex, showId, seriesNum, epNum, premieredDate):
+		if premieredDate is None or premieredDate == '':
+			log ('isNotOnYoutube: Invalid premiereDate', xbmc.LOGERROR)
+			return False
+
+		if episodeIndex is None or episodeIndex == '':
+			log ('isNotOnYoutube: Invalid episodeIndex', xbmc.LOGERROR)
+			return False
+
+		if showId is None or showId == '':
+			log ('isNotOnYoutube: Invalid showId', xbmc.LOGERROR)
+			return False
+
+		if seriesNum is None or seriesNum == '':
+			log ('isNotOnYoutube: Invalid seriesNum', xbmc.LOGERROR)
+			return False
+
+		if epNum is None or epNum == '':
+			log ('isNotOnYoutube: Invalid epNum', xbmc.LOGERROR)
+			return False
+
+		log ('isNotOnYoutube: showId: %s, seriesNumber: %s, episodeNumber: %s, episodeIndex: %s, premieredDate: %s, youtube_force_check: "%s"' % (str(showId), str(seriesNum), str(epNum), str(episodeIndex), premieredDate, str(__addon__.getSetting( 'youtube_force_check' ))), xbmc.LOGDEBUG)
+		# Only do this for the first two episodes, or for all episodes (since Aug 13 2012) if force_check is on
+		if episodeIndex > 1 and not __addon__.getSetting( 'youtube_force_check' ):
+			log ('isNotOnYoutube: Not checking youtube - episodeIndex > 1 and youtube_force_check not set', xbmc.LOGDEBUG)
+			return False
+		
+		# Only applies to recent episodes
+		if not utils.isRecentDate(premieredDate):
+			log ('isNotOnYoutube: Not checking youtube - not a recent episode', xbmc.LOGDEBUG)
+			return False
+
+		(youtubeId, errorYoutube) = self.getYoutubeId(showId, seriesNum, epNum)
+		if youtubeId is None:
+			# Episode not found, use the prefix
+			log ('isNotOnYoutube: Episode not found, use the prefix', xbmc.LOGDEBUG)
+			return True
+
+		log ('isNotOnYoutube: Episode found, not using the prefix', xbmc.LOGDEBUG)
+		return False
 
 

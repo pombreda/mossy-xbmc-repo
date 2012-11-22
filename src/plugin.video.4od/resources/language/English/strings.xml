@@ -27,6 +27,7 @@
   <string id="30410">Use Youtube if video is not available on 4od</string>
   <string id="30420">Socket Timeout</string>
   <string id="30430">Use Youtube for all videos</string>
+  <string id="30440">Show [Not on Youtube] for all recent episodes not on Youtube (can slow down episode listing)</string>
 
   <string id="30500">Search</string>
   <string id="30510">Page</string>

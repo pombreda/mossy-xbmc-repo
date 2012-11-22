@@ -254,7 +254,7 @@ class EpisodeList:
 	        listItems = []
 	        epsDict = dict()
 
-		firstItem = True
+		episodeIndex = 0
 	        for listItemHtml in self.listItemsHtml:
 	                self.getEpisodeDetails(listItemHtml)
 
@@ -268,12 +268,11 @@ class EpisodeList:
 
 			self.refineEpisodeDetails()
 
-			if firstItem == True:
-				firstItem = False
-				(youtubeId, errorYoutube) = youtube.getYoutubeId(self.showId, self.seriesNum, self.epNum)
-				if youtubeId is None:
-					self.label = '[Not on Youtube] ' + self.label
-                
+			if youtube.isNotOnYoutube(episodeIndex, self.showId, self.seriesNum, self.epNum, self.premieredDate):
+				self.label = '[Not on Youtube] ' + self.label
+
+			episodeIndex = episodeIndex + 1
+
 	                newListItem = self.createNewListItem( )
 	                #url = self.baseURL + '?ep=' + mycgi.URLEscape(self.assetId) + "&show=" + mycgi.URLEscape(self.showId) + "&title=" + mycgi.URLEscape(self.label) + "&fn=" + mycgi.URLEscape(self.filename) + "&swfPlayer=" + mycgi.URLEscape(self.swfPlayer)
 			url = self.baseURL + '?ep=' + mycgi.URLEscape(self.assetId) + "&show=" + mycgi.URLEscape(self.showId) + "&seriesNumber=" + mycgi.URLEscape(str(self.seriesNum)) + "&episodeNumber=" + mycgi.URLEscape(str(self.epNum)) + "&title=" + mycgi.URLEscape(self.label) + "&swfPlayer=" + mycgi.URLEscape(self.swfPlayer)
