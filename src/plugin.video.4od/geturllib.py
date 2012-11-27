@@ -227,7 +227,7 @@ def CachePage(url, data):
 		xbmc.log ("Add page to cache", xbmc.LOGDEBUG)
 		_Cache_Add( url, data )
 
-
+def GetURL( url, logLevel, maxAgeSeconds=0 ):
 	global gLastCode
 
 	xbmc.log ("GetURL: " + url, xbmc.LOGDEBUG)
