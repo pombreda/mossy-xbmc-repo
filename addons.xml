@@ -2,7 +2,7 @@
 <addons>
  <addon id="plugin.video.4od"
        name="4oD"
-       version="1.8.5"
+       version="1.8.6"
        provider-name="mossy">
     <requires>
         <import addon="xbmc.python" version="2.0"/>
@@ -13,6 +13,7 @@
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
+	<broken>Broken for ALL videos, due to changes in the 4oD and Youtube encryption</broken>
 	<language>en</language>
         <platform>all</platform>
         <summary>Channel 4 On Demand</summary>
