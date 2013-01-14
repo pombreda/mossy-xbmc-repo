@@ -23,17 +23,17 @@
 </addon>
 
 <addon id="plugin.video.irishtv"
-       name="Irish TV"
-       version="0.99.0"
+       name="Irish TV (Frodo)"
+       version="0.99.1"
        provider-name="mossy">
     <requires>
-        <import addon="xbmc.python" version="2.0"/>
+        <import addon="xbmc.python" version="2.1.0"/>
 	<import addon="script.module.beautifulsoup" version="3.2.0"/>
     </requires>
     <extension point="xbmc.python.pluginsource"
                library="default.py">
         <provides>video</provides>
-    </extension>
+    </extension> 
     <extension point="xbmc.addon.metadata">
 	<language>en</language>
         <platform>all</platform>
@@ -45,7 +45,7 @@
 
 <addon id="repository.mossy" 
         name="Mossy's Add-ons" 
-        version="1.0.1" 
+        version="1.0.2"
         provider-name="mossy">
     <extension point="xbmc.addon.repository" 
         name="Mossy's Add-ons">
@@ -55,7 +55,7 @@
     </extension>
     <extension point="xbmc.addon.metadata">
         <summary>Install add-ons from Mossy's add-on repository</summary>
-        <description>Download and install XBMC add-ons.</description>
+        <description>Home of Irish TV Player</description>
         <disclaimer>If it breaks, you get to keep the pieces</disclaimer>
         <platform>all</platform>
     </extension>

@@ -1,0 +1,546 @@
+# XBMC Media Center language file
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2013-01-13 15:52+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgctxt "#0"
+msgid "OK"
+msgstr ""
+
+#empty strings from id 1 to 9999
+
+msgctxt "#10000"
+msgid "RTE"
+msgstr ""
+
+#empty strings from id 10001 to 19999
+
+msgctxt "#20000"
+msgid "Error getting %s Player Home page"
+msgstr ""
+
+#empty strings from id 20001 to 20009
+
+msgctxt "#20010"
+msgid "Cannot show RTE root menu"
+msgstr ""
+
+#empty strings from id 20011 to 20019
+
+msgctxt "#20020"
+msgid "Can't find dropdown-programmes"
+msgstr ""
+
+#empty strings from id 20021 to 29999
+
+msgctxt "#30000"
+msgid "ProviderFactory returned None for providerName: %s"
+msgstr ""
+
+#empty strings from id 30001 to 30009
+
+msgctxt "#30010"
+msgid "Cannot show root menu"
+msgstr ""
+
+#empty strings from id 30011 to 30019
+
+msgctxt "#30020"
+msgid "Error processing provider name"
+msgstr ""
+
+#empty strings from id 30021 to 30029
+
+msgctxt "#30030"
+msgid "Can't find 'page' parameter"
+msgstr ""
+
+#empty strings from id 30031 to 30039
+
+msgctxt "#30040"
+msgid "Error processing command"
+msgstr ""
+
+#empty strings from id 30041 to 30049
+
+msgctxt "#30050"
+msgid "Error getting web page"
+msgstr ""
+
+#empty strings from id 30051 to 30059
+
+msgctxt "#30060"
+msgid "Data returned from web page: %s, is: '%s'"
+msgstr ""
+
+#empty strings from id 30061 to 30099
+
+msgctxt "#30100"
+msgid "General"
+msgstr ""
+
+#empty strings from id 30101 to 30109
+
+msgctxt "#30110"
+msgid "Default action on select"
+msgstr ""
+
+#empty strings from id 30111 to 30119
+
+msgctxt "#30120"
+msgid "Ask"
+msgstr ""
+
+#empty strings from id 30121 to 30129
+
+msgctxt "#30130"
+msgid "Play"
+msgstr ""
+
+#empty strings from id 30131 to 30139
+
+msgctxt "#30140"
+msgid "Download"
+msgstr ""
+
+#empty strings from id 30141 to 30149
+
+msgctxt "#30150"
+msgid "Use paging (list 50 programmes at a time)"
+msgstr ""
+
+#empty strings from id 30151 to 30159
+
+msgctxt "#30160"
+msgid "Subtitles"
+msgstr ""
+
+#empty strings from id 30161 to 30169
+
+msgctxt "#30170"
+msgid "Disable HTTP Cache"
+msgstr ""
+
+#empty strings from id 30171 to 30199
+
+msgctxt "#30200"
+msgid "Downloads"
+msgstr ""
+
+#empty strings from id 30201 to 30209
+
+msgctxt "#30210"
+msgid "Path to rtmpdump"
+msgstr ""
+
+#empty strings from id 30211 to 30219
+
+msgctxt "#30220"
+msgid "Default download folder"
+msgstr ""
+
+#empty strings from id 30221 to 30229
+
+msgctxt "#30230"
+msgid "Ask for folder"
+msgstr ""
+
+#empty strings from id 30231 to 30239
+
+msgctxt "#30240"
+msgid "Ask for filename"
+msgstr ""
+
+#empty strings from id 30241 to 30299
+
+msgctxt "#30300"
+msgid "Proxy / Forward IP"
+msgstr ""
+
+#empty strings from id 30301 to 30309
+
+msgctxt "#30310"
+msgid "Use Proxy"
+msgstr ""
+
+#empty strings from id 30311 to 30314
+
+msgctxt "#30315"
+msgid "Proxy Type"
+msgstr ""
+
+#empty strings from id 30316 to 30319
+
+msgctxt "#30320"
+msgid "Proxy Server/IP"
+msgstr ""
+
+#empty strings from id 30321 to 30329
+
+msgctxt "#30330"
+msgid "Proxy Port"
+msgstr ""
+
+#empty strings from id 30331 to 30339
+
+msgctxt "#30340"
+msgid "Proxy Username"
+msgstr ""
+
+#empty strings from id 30341 to 30349
+
+msgctxt "#30350"
+msgid "Proxy Password"
+msgstr ""
+
+#empty strings from id 30351 to 30359
+
+msgctxt "#30360"
+msgid "Method"
+msgstr ""
+
+#empty strings from id 30361 to 30369
+
+msgctxt "#30370"
+msgid "Forward IP"
+msgstr ""
+
+#empty strings from id 30371 to 30379
+
+msgctxt "#30380"
+msgid "[RTE] Get programme descriptions (slows down episode listings)"
+msgstr ""
+
+#empty strings from id 30381 to 30399
+
+msgctxt "#30400"
+msgid "Advanced"
+msgstr ""
+
+#empty strings from id 30401 to 30419
+
+msgctxt "#30420"
+msgid "Socket Timeout"
+msgstr ""
+
+#empty strings from id 30421 to 30499
+
+msgctxt "#30500"
+msgid "Search"
+msgstr ""
+
+#empty strings from id 30501 to 30519
+
+msgctxt "#30520"
+msgid "Unable to determine swfPlayer URL. Using default: %s"
+msgstr ""
+
+#empty strings from id 30521 to 30529
+
+msgctxt "#30530"
+msgid "Do you want to play or download?"
+msgstr ""
+
+#empty strings from id 30531 to 30539
+
+msgctxt "#30540"
+msgid "Playback Error"
+msgstr ""
+
+#empty strings from id 30541 to 30559
+
+msgctxt "#30560"
+msgid "Download Error"
+msgstr ""
+
+#empty strings from id 30561 to 30569
+
+msgctxt "#30570"
+msgid "You have not located your rtmpdump executable.\n Please update the addon settings and try again."
+msgstr ""
+
+#empty strings from id 30571 to 30579
+
+msgctxt "#30580"
+msgid "You have not set the default download folder.\n Please update the addon settings and try again."
+msgstr ""
+
+#empty strings from id 30581 to 30589
+
+msgctxt "#30590"
+msgid "Save programme as..."
+msgstr ""
+
+#empty strings from id 30591 to 30599
+
+msgctxt "#30600"
+msgid "Save to folder..."
+msgstr ""
+
+#empty strings from id 30601 to 30609
+
+msgctxt "#30610"
+msgid "Starting download"
+msgstr ""
+
+#empty strings from id 30611 to 30619
+
+msgctxt "#30620"
+msgid "Download Finished"
+msgstr ""
+
+#empty strings from id 30621 to 30699
+
+msgctxt "#30700"
+msgid "See log for details"
+msgstr ""
+
+#empty strings from id 30701 to 30704
+
+msgctxt "#30705"
+msgid "Can't find pattern in string"
+msgstr ""
+
+#empty strings from id 30706 to 30709
+
+msgctxt "#30710"
+msgid "Can't determine genre"
+msgstr ""
+
+#empty strings from id 30711 to 30714
+
+msgctxt "#30715"
+msgid "Error getting image"
+msgstr ""
+
+#empty strings from id 30716 to 30754
+
+msgctxt "#30755"
+msgid "Cannot proceed"
+msgstr ""
+
+#empty strings from id 30756 to 30779
+
+msgctxt "#30780"
+msgid "Error processing web page"
+msgstr ""
+
+#empty strings from id 30781 to 30859
+
+msgctxt "#30860"
+msgid "Try again. Change the socket timeout in the plugin settings if you see this problem a lot"
+msgstr ""
+
+#empty strings from id 30861 to 30864
+
+msgctxt "#30865"
+msgid "Timeout occurred two times in a row"
+msgstr ""
+
+#empty strings from id 30866 to 30869
+
+msgctxt "#30870"
+msgid "Socket timed out"
+msgstr ""
+
+#empty strings from id 30871 to 30894
+
+msgctxt "#30895"
+msgid "Timed out - trying again"
+msgstr ""
+
+#empty strings from id 30896 to 39999
+
+msgctxt "#40000"
+msgid "rtmpdump path is not set"
+msgstr ""
+
+#empty strings from id 40001 to 40009
+
+msgctxt "#40010"
+msgid "Download Folder is not set"
+msgstr ""
+
+#empty strings from id 40011 to 40019
+
+msgctxt "#40020"
+msgid "rtmp url is not set"
+msgstr ""
+
+#empty strings from id 40021 to 40029
+
+msgctxt "#40030"
+msgid "Error getting count of available episodes"
+msgstr ""
+
+#empty strings from id 40031 to 40039
+
+msgctxt "#40040"
+msgid "Cannot show available episodes"
+msgstr ""
+
+#empty strings from id 40041 to 40049
+
+msgctxt "#40050"
+msgid "Error getting web page: %s"
+msgstr ""
+
+#empty strings from id 40051 to 40059
+
+msgctxt "#40060"
+msgid "Error processing web page: %s"
+msgstr ""
+
+#empty strings from id 40061 to 40069
+
+msgctxt "#40070"
+msgid "Error showing root menu"
+msgstr ""
+
+#empty strings from id 40071 to 40079
+
+msgctxt "#40080"
+msgid "Error adding links"
+msgstr ""
+
+#empty strings from id 40081 to 40089
+
+msgctxt "#40090"
+msgid "Error listing submenu"
+msgstr ""
+
+#empty strings from id 40091 to 40099
+
+msgctxt "#40100"
+msgid "Error getting list of shows"
+msgstr ""
+
+#empty strings from id 40101 to 40109
+
+msgctxt "#40110"
+msgid "Error getting count of available episodes"
+msgstr ""
+
+#empty strings from id 40111 to 40119
+
+msgctxt "#40120"
+msgid "Error playing or downloading episode %s"
+msgstr ""
+
+#empty strings from id 40121 to 40129
+
+msgctxt "#40130"
+msgid "Error processing rtmp"
+msgstr ""
+
+#empty strings from id 40131 to 40139
+
+msgctxt "#40140"
+msgid "Provider '%s' not found"
+msgstr ""
+
+#empty strings from id 40141 to 40149
+
+msgctxt "#40150"
+msgid "Error getting provider"
+msgstr ""
+
+#empty strings from id 40151 to 40159
+
+msgctxt "#40160"
+msgid "Unable to determine swfPlayer URL. Using default %s"
+msgstr ""
+
+#empty strings from id 40161 to 40169
+
+msgctxt "#40170"
+msgid "Error performing query %s"
+msgstr ""
+
+#empty strings from id 40171 to 40179
+
+msgctxt "#40180"
+msgid "Error getting Live TV information"
+msgstr ""
+
+#empty strings from id 40181 to 40189
+
+msgctxt "#40190"
+msgid "Error playing Live TV"
+msgstr ""
+
+#empty strings from id 40191 to 40199
+
+msgctxt "#40200"
+msgid "Error getting search url: Using default "
+msgstr ""
+
+#empty strings from id 40201 to 40209
+
+msgctxt "#40210"
+msgid "Error getting player.js url: Using default %s"
+msgstr ""
+
+#empty strings from id 40211 to 40219
+
+msgctxt "#40220"
+msgid "Error creating Search item"
+msgstr ""
+
+#empty strings from id 40221 to 40229
+
+msgctxt "#40230"
+msgid "Error getting RTMP data"
+msgstr ""
+
+#empty strings from id 40231 to 40239
+
+msgctxt "#40240"
+msgid "Error processing categories"
+msgstr ""
+
+#empty strings from id 40241 to 40259
+
+msgctxt "#40260"
+msgid "Unable to determine \"All Shows\" URL. Using default %s"
+msgstr ""
+
+#empty strings from id 40261 to 40269
+
+msgctxt "#40270"
+msgid "All Shows - A to Z"
+msgstr ""
+
+#empty strings from id 40271 to 40279
+
+msgctxt "#40280"
+msgid "All Shows - By Date"
+msgstr ""
+
+#empty strings from id 40281 to 40289
+
+msgctxt "#40290"
+msgid "Search"
+msgstr ""
+
+#empty strings from id 40291 to 40299
+
+msgctxt "#40300"
+msgid "Error processing %s"
+msgstr ""
+
+#empty strings from id 40301 to 40309
+
+msgctxt "#40310"
+msgid "Error creating calendar list"
+msgstr ""

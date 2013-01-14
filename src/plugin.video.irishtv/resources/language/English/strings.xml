@@ -3,10 +3,9 @@
 
   <string id="10000">RTE</string>
 
-  <string id="20000">Error getting RTE Player Home page</string>
+  <string id="20000">Error getting %s Player Home page</string>
   <string id="20010">Cannot show RTE root menu</string>
   <string id="20020">Can't find dropdown-programmes</string>
-  <string id="20001">x</string>
 
   <string id="30000">ProviderFactory returned None for providerName: %s</string>
   <string id="30010">Cannot show root menu</string>
@@ -15,9 +14,6 @@
   <string id="30040">Error processing command</string>
   <string id="30050">Error getting web page</string>
   <string id="30060">Data returned from web page: %s, is: '%s'</string>
-
-  <string id="30001">x</string>
-  <string id="30001">x</string>
 
   <string id="30100">General</string>
   <string id="30110">Default action on select</string>
@@ -34,19 +30,21 @@
   <string id="30230">Ask for folder</string>
   <string id="30240">Ask for filename</string>
 
-  <string id="30300">Proxy</string>
+  <string id="30300">Proxy / Forward IP</string>
   <string id="30310">Use Proxy</string>
   <string id="30315">Proxy Type</string>
   <string id="30320">Proxy Server/IP</string>
   <string id="30330">Proxy Port</string>
   <string id="30340">Proxy Username</string>
   <string id="30350">Proxy Password</string>
-
+  <string id="30360">Method</string>
+  <string id="30370">Forward IP</string>
+  <string id="30380">[RTE] Get programme descriptions (slows down episode listings)</string>
   <string id="30400">Advanced</string>
   <string id="30420">Socket Timeout</string>
 
   <string id="30500">Search</string>
-  <string id="30520">Unable to determine swfPlayer URL. Using default: </string>
+  <string id="30520">Unable to determine swfPlayer URL. Using default: %s</string>
   <string id="30530">Do you want to play or download?</string>
   <string id="30540">Playback Error</string>
   <string id="30560">Download Error</string>
@@ -64,10 +62,42 @@
   <string id="30755">Cannot proceed</string>
   <string id="30780">Error processing web page</string>
 
-  <string id="30860">Try again. Change the socket timeout in the plugin settings if you see this problem a lot</string>
+  <string id="30860">Trying again. Change the socket timeout in the plugin settings if you see this problem a lot</string>
   <string id="30865">Timeout occurred two times in a row</string>
   <string id="30870">Socket timed out</string>
 
   <string id="30895">Timed out - trying again</string>
+
+  <string id="40000">rtmpdump path is not set</string>
+  <string id="40010">Download Folder is not set</string>
+  <string id="40020">rtmp url is not set</string>
+  <string id="40030">Error getting count of available episodes</string>
+  <string id="40040">Cannot show available episodes</string>
+  <string id="40050">Error getting web page: %s</string>
+  <string id="40060">Error processing web page: %s</string>
+  <string id="40070">Error showing root menu</string>
+  <string id="40080">Error adding links</string>
+  <string id="40090">Error listing submenu</string>
+  <string id="40100">Error getting list of shows</string>
+  <string id="40110">Error getting count of available episodes</string>
+  <string id="40120">Error playing or downloading episode %s</string>
+  <string id="40130">Error processing rtmp</string>
+  <string id="40140">Provider '%s' not found</string>
+  <string id="40150">Error getting provider</string>
+  <string id="40160">Unable to determine swfPlayer URL. Using default %s</string>
+  <string id="40170">Error performing query %s</string>
+  <string id="40180">Error getting Live TV information</string>
+  <string id="40190">Error playing Live TV</string>
+  <string id="40200">Error getting search url: Using default </string>
+  <string id="40210">Error getting player.js url: Using default %s</string>
+  <string id="40220">Error creating Search item</string>
+  <string id="40230">Error getting RTMP data</string>
+  <string id="40240">Error processing categories</string>
+  <string id="40260">Unable to determine "All Shows" URL. Using default %s</string>
+  <string id="40270">All Shows - A to Z</string>
+  <string id="40280">All Shows - By Date</string>
+  <string id="40290">Search</string>
+  <string id="40300">Error processing %s</string>
+  <string id="40310">Error creating calendar list</string>
 </strings>
 
