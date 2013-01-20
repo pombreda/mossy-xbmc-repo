@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2013-01-13 15:52+0000\n"
+"POT-Creation-Date: 2013-01-20 16:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE\n"
@@ -209,7 +209,17 @@ msgctxt "#30360"
 msgid "Method"
 msgstr ""
 
-#empty strings from id 30361 to 30369
+#empty string with id 30361
+
+msgctxt "#30362"
+msgid "IP Segment 1 (e.g. 46.X.X.X)"
+msgstr ""
+
+msgctxt "#30363"
+msgid "IP Segment 2 (e.g. X.7.X.X)"
+msgstr ""
+
+#empty strings from id 30364 to 30369
 
 msgctxt "#30370"
 msgid "Forward IP"
@@ -338,7 +348,7 @@ msgstr ""
 #empty strings from id 30781 to 30859
 
 msgctxt "#30860"
-msgid "Try again. Change the socket timeout in the plugin settings if you see this problem a lot"
+msgid "Trying again. Change the socket timeout in the plugin settings if you see this problem a lot"
 msgstr ""
 
 #empty strings from id 30861 to 30864
@@ -543,4 +553,52 @@ msgstr ""
 
 msgctxt "#40310"
 msgid "Error creating calendar list"
+msgstr ""
+
+#empty strings from id 40311 to 40319
+
+msgctxt "#40320"
+msgid "Error getting rtmp url. Using default: %s"
+msgstr ""
+
+#empty strings from id 40321 to 40324
+
+msgctxt "#40325"
+msgid "Error getting rtmp url"
+msgstr ""
+
+#empty strings from id 40326 to 40329
+
+msgctxt "#40330"
+msgid "Your IP seems to be BLOCKED by AerTV"
+msgstr ""
+
+#empty strings from id 40331 to 40339
+
+msgctxt "#40340"
+msgid "Error preparing or playing stream"
+msgstr ""
+
+#empty strings from id 40341 to 40349
+
+msgctxt "#40350"
+msgid "Error processing channel"
+msgstr ""
+
+#empty strings from id 40351 to 40359
+
+msgctxt "#40360"
+msgid "Cannot play video stream"
+msgstr ""
+
+#empty strings from id 40361 to 40369
+
+msgctxt "#40370"
+msgid "Error getting title and logo info for %s"
+msgstr ""
+
+#empty strings from id 40371 to 40379
+
+msgctxt "#40380"
+msgid "Error processing search result"
 msgstr ""

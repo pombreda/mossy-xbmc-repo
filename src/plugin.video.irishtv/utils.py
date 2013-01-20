@@ -112,3 +112,9 @@ def isVariableDefined(variable):
         return True
     except NameError:
         return False
+    
+def extractJSON(text):
+    start = text.index('(') + 1
+    end = text.rindex(')')
+    
+    return text[start:end]

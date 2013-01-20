@@ -51,15 +51,15 @@ class Provider(object):
         else:
             return self.ShowRootMenu()
 
-    def initialise(self, cache, baseurl, pluginhandle):
-        self.cache = cache
+    def initialise(self, httpManager, baseurl, pluginhandle):
+        self.httpManager = httpManager
         self.baseurl = baseurl
         self.pluginhandle = pluginhandle
         self.addon = sys.modules[u"__main__"].addon
         self.language = sys.modules[u"__main__"].language
 
     def GetURLStart(self):
-        return self.baseurl + u'?provider=' + mycgi.URLEscape(self.GetProviderId())
+        return self.baseurl + u'?provider=' + self.GetProviderId()
     
     def GetProviderId(self):
         pass
@@ -211,7 +211,7 @@ class Provider(object):
         return requestLevel
     
     def lastPageFromCache(self):
-        if self.cache.getGotFromCache() and self.cache.getGotFromCache():
+        if self.httpManager.getGotFromCache() and self.httpManager.getGotFromCache():
             return True
         
         return False
@@ -264,7 +264,7 @@ class Provider(object):
         self.log(u"url '%s', pattern '%s'" % (url, pattern), xbmc.LOGDEBUG)
     
         try:
-            data = self.cache.GetURLFromCache(url, maxAge)
+            data = self.httpManager.GetWebPage(url, maxAge)
     
             self.log(u"len(data): " + str(len(data)), xbmc.LOGDEBUG)
     

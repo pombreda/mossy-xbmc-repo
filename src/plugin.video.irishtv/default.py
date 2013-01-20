@@ -1,6 +1,9 @@
 #/bin/python
 # -*- coding: utf-8 -*-
 
+"""
+# http://wiki.xbmc.org/index.php?title=How-to:Debug_Python_Scripts_with_Eclipse
+
 REMOTE_DBG = False
 
 # append pydev remote debugger
@@ -17,6 +20,7 @@ if REMOTE_DBG:
 		sys.stderr.write("Error: " +
 			"You must add org.python.pydev.debug.pysrc to your PYTHONPATH.")
 		sys.exit(1)
+"""
 
 import os
 import xbmcplugin
@@ -25,6 +29,8 @@ import xbmc
 import re
 
 from xbmcaddon import Addon
+from loggingexception import LoggingException
+
 
 pluginName  = u'plugin.video.irishtv'
 pluginHandle = int(sys.argv[1])
@@ -36,7 +42,7 @@ language = addon.getLocalizedString
 import mycgi
 
 from loggingexception import LoggingException
-from cachemanager import CacheManager
+from httpmanager import HttpManager
 
 dbg = addon.getSetting("debug") == "true"
 dbglevel = 3
@@ -52,7 +58,7 @@ import providerfactory
 
 #import SimpleDownloader
 #__downloader__ = SimpleDownloader.SimpleDownloader()
-cache = CacheManager()
+httpManager = HttpManager()
 
 
 # Use masterprofile rather profile, because we are caching data that may be used by more than one user on the machine
@@ -89,7 +95,7 @@ def ShowProviders():
 		providerName = provider.GetProviderId()
 		log(u"Adding " + providerName + u" provider", xbmc.LOGDEBUG)
 		newListItem = xbmcgui.ListItem( providerName )
-		url = baseURL + u'?provider=' + mycgi.URLEscape(providerName)
+		url = baseURL + u'?provider=' + providerName
 
 		log(u"url: " + url, xbmc.LOGDEBUG)
 		thumbnailPath = provider.GetThumbnailPath(providerName)
@@ -129,12 +135,12 @@ def executeCommand():
 			
 			if provider is None:
 				# ProviderFactory return none for providerName: %s
-				logException = LoggingException(u"executeCommand", language(30000) % providerName)
+				logException = LoggingException(language(30000) % providerName)
 				# 'Cannot proceed', Error processing provider name
 				logException.process(language(30755), language(30020), xbmc.LOGERROR)
 				return False
 			
-			provider.initialise(cache, sys.argv[0], pluginHandle)
+			provider.initialise(httpManager, sys.argv[0], pluginHandle)
 			success = provider.ExecuteCommand(mycgi)
 			log (u"executeCommand done", xbmc.LOGDEBUG)
 			
@@ -158,7 +164,7 @@ if __name__ == "__main__":
 
 		try:
 			if addon.getSetting('http_cache_disable') == 'false':
-				cache.SetCacheDir( CACHE_FOLDER )
+				httpManager.SetCacheDir( CACHE_FOLDER )
 	
 			InitTimeout()
 		
@@ -166,13 +172,13 @@ if __name__ == "__main__":
 			# Get the web page from the cache if it's there
 			# If there is an error when processing the web page from the cache
 			# we want to try again, this time getting the page from the web
-			cache.setGetFromCache(True)
+			httpManager.setGetFromCache(True)
 			success = executeCommand()			
 	
-			xbmc.log(u"success: %s, getGotFromCache(): %s" % (unicode(success), unicode(cache.getGotFromCache())), xbmc.LOGDEBUG)
+			xbmc.log(u"success: %s, getGotFromCache(): %s" % (unicode(success), unicode(httpManager.getGotFromCache())), xbmc.LOGDEBUG)
 			
-			if success is not None and success == False and cache.getGotFromCache() == True:
-				cache.setGetFromCache(False)
+			if success is not None and success == False and httpManager.getGotFromCache() == True:
+				httpManager.setGetFromCache(False)
 				executeCommand()
 				log (u"executeCommand after", xbmc.LOGDEBUG)
 				

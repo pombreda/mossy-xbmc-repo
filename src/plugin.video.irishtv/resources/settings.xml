@@ -10,11 +10,14 @@
 	  <!-- Proxy -->
     <category label="30300">
          <setting id="proxy_method" label="30360" type="enum" values="None|Proxy|IP Forwarding" default="0" />
-         <setting id="proxy_type" label="30315" type="enum" values="HTTP|HTTP (Tunneled)|SOCKS4|SOCKS5" enable="eq(-1,1)" default="0" />
-         <setting id="proxy_server" label="30320" type="text" default="" enable="eq(-2,1)" />
-         <setting id="proxy_port" label="30330" type="number" default="" enable="eq(-3,1)" />
-         <setting id="proxy_user" label="30340" type="text" enable="eq(-4,1)"  />
-         <setting id="proxy_pass" label="30350" type="text" option="hidden" enable="!eq(-4,2) + eq(-5,1)" />
+         <setting id="forward_segment1" label="30362" type="slider" range="1,1,255" enable="eq(-1,2)" default="46" option="int"/>
+         <setting id="forward_segment2" label="30363" type="slider" range="0,1,255" enable="eq(-2,2)" default="7" option="int"/>
+         <setting type="sep"/>
+         <setting id="proxy_type" label="30315" type="enum" values="HTTP|HTTP (Tunneled)|SOCKS4|SOCKS5" enable="eq(-4,1)" default="0" />
+         <setting id="proxy_server" label="30320" type="text" default="" enable="eq(-5,1)" />
+         <setting id="proxy_port" label="30330" type="number" default="" enable="eq(-6,1)" />
+         <setting id="proxy_user" label="30340" type="text" enable="eq(-7,1)"  />
+         <setting id="proxy_pass" label="30350" type="text" option="hidden" enable="!eq(-7,2) + eq(-8,1)" />
 	</category>
 
 	<!-- Downloads -->

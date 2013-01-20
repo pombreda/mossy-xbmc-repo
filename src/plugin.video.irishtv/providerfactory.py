@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
-
 import xbmc
 from xbmc import log
 from xbmcaddon import Addon
+from loggingexception import LoggingException
 
 from rte import RTEProvider
 from tv3 import TV3Provider
+from aertv import AerTVProvider
 
 # Provider names
 
-__providers__ = [RTEProvider(), TV3Provider()]
+__providers__ = [RTEProvider(), TV3Provider(), AerTVProvider()]
 
 
 def getProvider(name):
@@ -19,11 +20,7 @@ def getProvider(name):
         if name == provider.GetProviderId():
             return provider
 
-    # Provider '%s' not found
-    logException = LoggingException(u"getProvider()", self.language(40140) % name, html)
-
-    # Error getting provider, Provider '%s' not found
-    logException.process(self.language(40150), self.language(40140) % name, self.logLevel(xbmc.LOGERROR))
+    return None
 
 def getProviderList():
     return __providers__

@@ -38,6 +38,8 @@
   <string id="30340">Proxy Username</string>
   <string id="30350">Proxy Password</string>
   <string id="30360">Method</string>
+  <string id="30362">IP Segment 1 (e.g. 46.X.X.X)</string>
+  <string id="30363">IP Segment 2 (e.g. X.7.X.X)</string>
   <string id="30370">Forward IP</string>
   <string id="30380">[RTE] Get programme descriptions (slows down episode listings)</string>
   <string id="30400">Advanced</string>
@@ -99,5 +101,13 @@
   <string id="40290">Search</string>
   <string id="40300">Error processing %s</string>
   <string id="40310">Error creating calendar list</string>
+  <string id="40320">Error getting rtmp url. Using default: %s</string>
+  <string id="40325">Error getting rtmp url</string>
+  <string id="40330">Your IP seems to be BLOCKED by AerTV</string>
+  <string id="40340">Error preparing or playing stream</string>
+  <string id="40350">Error processing channel</string>
+  <string id="40360">Cannot play video stream</string>
+  <string id="40370">Error getting title and logo info for %s</string>
+  <string id="40380">Error processing search result</string>
 </strings>
 

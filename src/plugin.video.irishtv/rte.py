@@ -31,8 +31,7 @@ import rtmp
 from provider import Provider
 import HTMLParser
 
-from BeautifulSoup import BeautifulSoup          # For processing HTML
-from BeautifulSoup import BeautifulStoneSoup
+from BeautifulSoup import BeautifulSoup
 
 urlRoot = u"http://www.rte.ie"
 rootMenuUrl = u"http://www.rte.ie/player/ie/"
@@ -62,11 +61,11 @@ class RTEProvider(Provider):
         self.log(u"", xbmc.LOGDEBUG)
         
         try:
-            html = self.cache.GetURLFromCache(rootMenuUrl, 60).decode('utf8')
+            html = self.httpManager.GetWebPage(rootMenuUrl, 60).decode('utf8')
     
             if html is None or html == '':
                 # Error getting %s Player "Home" page
-                logException = LoggingException(u"RTEProvider::ShowRootMenu", self.language(20000) % self.GetProviderId())
+                logException = LoggingException(self.language(20000) % self.GetProviderId())
                 # 'Cannot show RTE root menu', Error getting RTE Player "Home" page
                 logException.process(self.language(20010) % self.GetProviderId(), self.language(20000) % self.GetProviderId(), self.logLevel(xbmc.LOGERROR))
                 return False
@@ -76,7 +75,7 @@ class RTEProvider(Provider):
     
             if categories == None:
                 # "Can't find dropdown-programmes"
-                logException = LoggingException(u"RTEProvider::ShowRootMenu", self.language(20020))
+                logException = LoggingException(self.language(20020))
                 # 'Cannot show RTE root menu', Error parsing web page
                 logException.process(self.language(20010)  % self.GetProviderId(), self.language(30780), self.logLevel(xbmc.LOGERROR))
                 #raise logException
@@ -160,7 +159,7 @@ class RTEProvider(Provider):
 
         try:
             self.log(u"urlRoot: " + urlRoot + u", page: " + page )
-            html = self.cache.GetURLFromCache( urlRoot + page, 1800 ).decode('utf8')
+            html = self.httpManager.GetWebPage( urlRoot + page, 1800 ).decode('utf8')
         except (Exception) as exception:
             if not isinstance(exception, LoggingException):
                 exception = LoggingException.fromException(exception)
@@ -187,7 +186,7 @@ class RTEProvider(Provider):
 
         defaultChannels = {u'RT\xc9 One' : u'/player/ie/live/8/', u'RT\xc9 News Now' : u'/player/ie/live/7/', u'RT\xc9 Two' : u'/player/ie/live/10/'}
         try:
-            html = self.cache.GetURLFromCache(rootMenuUrl, 60).decode('utf8')
+            html = self.httpManager.GetWebPage(rootMenuUrl, 60).decode('utf8')
     
             soup = BeautifulSoup(html, selfClosingTags=['img'])
 #            soup.find('aside', 'sidebar-content-box.clearfix').find('ul', 'sidebar-live-list')
@@ -643,7 +642,7 @@ class RTEProvider(Provider):
         self.log(u"", xbmc.LOGDEBUG)
         
         try:
-            xml = self.cache.GetURLFromCache(configUrl, 20000).decode('utf8')
+            xml = self.httpManager.GetWebPage(configUrl, 20000).decode('utf8')
             soup = BeautifulStoneSoup(xml)
             
             playerUrl = soup.find("player")['url']
@@ -676,7 +675,7 @@ class RTEProvider(Provider):
 
         try:
             if soup is None:
-                html = self.cache.GetURLFromCache(showUrl % episodeId, 20000).decode('utf8')
+                html = self.httpManager.GetWebPage(showUrl % episodeId, 20000).decode('utf8')
                 soup = BeautifulSoup(html, selfClosingTags=[u'img'])
             
             image = soup.find(u'meta', { u'property' : u"og:image"} )[u'content']
@@ -699,7 +698,7 @@ class RTEProvider(Provider):
     
         try:
             if soup is None:
-                html = self.cache.GetURLFromCache(showUrl % episodeId, 20000).decode('utf8')
+                html = self.httpManager.GetWebPage(showUrl % episodeId, 20000).decode('utf8')
                 soup = BeautifulSoup(html, selfClosingTags=[u'img'])
     
             title = soup.find(u'meta', { u'name' : u"programme"} )[u'content']
@@ -734,7 +733,7 @@ class RTEProvider(Provider):
         swfPlayer = self.GetSWFPlayer()
     
         try:
-            html = self.cache.GetURLFromCache(showUrl % episodeId, 20000).decode('utf8')
+            html = self.httpManager.GetWebPage(showUrl % episodeId, 20000).decode('utf8')
     
             soup = BeautifulSoup(html, selfClosingTags=[u'img'])
             feedsPrefix = soup.find(u'meta', { u'name' : u"feeds-prefix"} )[u'content']
@@ -899,9 +898,9 @@ class RTEProvider(Provider):
         
     def GetSearchURL(self):
         try:
-            rootMenuHtml = self.cache.GetURLFromCache(rootMenuUrl, 60).decode('utf8')
+            rootMenuHtml = self.httpManager.GetWebPage(rootMenuUrl, 60).decode('utf8')
             playerJSUrl = self.GetPlayerJSURL(rootMenuHtml)
-            html = self.cache.GetURLFromCache(playerJSUrl, 20000).decode('utf8')
+            html = self.httpManager.GetWebPage(playerJSUrl, 20000).decode('utf8')
 
             programmeSearchIndex = html.find('Programme Search')
             match=re.search("window.location.href = \'(.*?)\'", html[programmeSearchIndex:])
@@ -924,7 +923,7 @@ class RTEProvider(Provider):
              
         self.log(u"queryUrl: %s" % queryUrl, xbmc.LOGDEBUG)
         try:
-            html = self.cache.GetURLFromCache( queryUrl, 1800 ).decode('utf8')
+            html = self.httpManager.GetWebPage( queryUrl, 1800 ).decode('utf8')
             if html is None or html == '':
                 # Data returned from web page: %s, is: '%s'
                 logException = LoggingException(logMessage = self.language(30060) % ( __SEARCH__ + mycgi.URLEscape(query), html))
