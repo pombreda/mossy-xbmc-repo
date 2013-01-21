@@ -12,7 +12,7 @@
     </extension>
     <extension point="xbmc.addon.metadata">
         <summary>Install add-ons from Mossys add-on repository</summary>
-        <description>Home of Irish TV Player & 4oD</description>
+        <description>Home of Irish TV Player &amp; 4oD</description>
         <disclaimer>If it breaks, you get to keep the pieces</disclaimer>
         <platform>all</platform>
     </extension>
