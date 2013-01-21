@@ -16,7 +16,7 @@ from loggingexception import LoggingException
 import rtmp
 
 from provider import Provider
-from BeautifulSoup import BeautifulSoup       
+from BeautifulSoup import BeautifulSoup       , NavigableString
 
 import HTMLParser
 
@@ -161,7 +161,18 @@ class TV3Provider(Provider):
 			exception.process(severity = self.logLevel(xbmc.LOGERROR))
 			return False
 
-		return self.PlayEpisode(page, html)
+		try:
+			return self.PlayEpisode(page, html)
+		except (Exception) as exception:
+			if not isinstance(exception, LoggingException):
+				exception = LoggingException.fromException(exception)
+			
+			# "Error playing or downloading episode %s"
+			exception.addLogMessage(self.language(40120) % "")
+			# "Error processing video"
+			exception.process(severity = self.logLevel(xbmc.LOGERROR))
+			return False
+
 				
 	def GetCategories(self, html):
 		categories = []
@@ -272,7 +283,7 @@ class TV3Provider(Provider):
 				
 				programme = self.GetNameFromGridshow(gridshow)
 				# "Error processing <programme>"
-				exception = LoggingException(logMessage = self.language(40300) % programme + "\n" + repr(gridshow))
+				exception.addLogMessage(self.language(40300) % programme + "\n" + repr(gridshow))
 				exception.process(self.language(40300) % programme, "", xbmc.LOGWARNING)
 			
 		xbmcplugin.addDirectoryItems( handle=self.pluginhandle, items=listItems )
@@ -364,8 +375,14 @@ class TV3Provider(Provider):
 						if len(videos) == 1:
 							self.AddAllShowListItem(title, videos[0], listItems, thumbnailPath)
 						else:					
-							title = title + ", " + unicode(len(videos)) + " episodes available" 	 
-							description = self.fullDecode(soup.find('div', {'id':'tooltip_showcontent'}).contents[0])
+							title = title + ", " + unicode(len(videos)) + " episodes available"
+							
+							description = soup.find('div', {'id':'tooltip_showcontent'}).contents[0]
+							
+							if description is None or not isinstance(description, NavigableString):
+								description = ''
+							else:
+								description = self.fullDecode(description)
 							
 							infoLabels = {'Title': title, 'Plot': description, 'PlotOutline': description}
 		
@@ -375,13 +392,13 @@ class TV3Provider(Provider):
 			
 							url = self.GetURLStart() + '&page=' + mycgi.URLEscape(thumbnailPath) + '&allShows=1'
 							listItems.append( (url,newListItem,True) )
-					except:
+					except (Exception) as exception:
 						if not isinstance(exception, LoggingException):
 							exception = LoggingException.fromException(exception)
 						
 						programme = self.GetNameFromGridshow(gridshow)
 						# "Error processing <programme>"
-						exception = LoggingException(logMessage = self.language(40300) % programme + "\n" + repr(gridshow))
+						exception.addLogMessage(logMessage = self.language(40300) % programme + "\n" + repr(gridshow))
 						exception.process(self.language(40300) % programme, "", xbmc.LOGWARNING)
 						
 			else:
@@ -398,12 +415,12 @@ class TV3Provider(Provider):
  				for video in videos:
  					try:
  					 	self.AddAllShowListItem(title, video, listItems)
-					except:
+					except (Exception) as exception:
 						if not isinstance(exception, LoggingException):
 							exception = LoggingException.fromException(exception)
 						
 						# "Error processing <programme>"
-						exception = LoggingException(logMessage = self.language(40300) % title + "\n" + repr(video))
+						exception.addLogMessage(logMessage = self.language(40300) % title + "\n" + repr(video))
 						exception.process(self.language(40300) % title, "", xbmc.LOGWARNING)
 						
 
@@ -414,7 +431,7 @@ class TV3Provider(Provider):
 				exception = LoggingException.fromException(exception)
 
 			# Error processing "Show All" menu
-			exception.addLogMessage(self.language(40070))
+			exception.addLogMessage(self.language(40390))
 			exception.process(severity = self.logLevel(xbmc.LOGERROR))
 			return False
 
@@ -457,7 +474,7 @@ class TV3Provider(Provider):
 					exception = LoggingException.fromException(exception)
 			
 				# "Error processing search result"
-				exception = LoggingException(logMessage = self.language(40380) + "\n" + repr(video))
+				exception.addLogMessage(logMessage = self.language(40380) + "\n" + repr(video))
 				exception.process(self.language(40380), "", xbmc.LOGWARNING)
 			
 
@@ -561,7 +578,7 @@ class TV3Provider(Provider):
 
 		soup = BeautifulSoup(html)
 
-		ageCheck = soup.find('div', {'id':'age_check_holder'})
+		ageCheck = soup.find('div', {'id':'age_check_form_row'})
 		
 		if ageCheck is not None:
 			
@@ -572,10 +589,10 @@ class TV3Provider(Provider):
 				exception = LoggingException.fromException(exception)
 	
 				# Error getting web page: %s
-				logException.addLogMessage(self.language(40050) % ( urlRoot + page ) )
+				exception.addLogMessage(self.language(40050) % ( urlRoot + page ) )
 	
 				# Error getting web page
-				logException.process(self.language(40050) % u'', u'', self.logLevel(xbmc.LOGERROR))
+				exception.process(self.language(40050) % u'', u'', severity = self.logLevel(xbmc.LOGERROR))
 				return False
 	
 		rtmpVar = self.InitialiseRTMP(soup)
@@ -712,7 +729,7 @@ class TV3Provider(Provider):
 				
 			details = details + utils.valueIfDefined(url, 'url')
 			
-			exception = LoggingException(logMessage = message + "\n" + details)
+			exception.addLogMessage(logMessage = message + "\n" + details)
 			# "Error creating calendar list"
 			exception.process(message, "", self.logLevel(xbmc.LOGERROR))
 			return False
@@ -765,7 +782,7 @@ class TV3Provider(Provider):
 					exception = LoggingException.fromException(exception)
 				
 				# "Error processing video"
-				exception = LoggingException(logMessage = self.language(40300) % "video\n" + repr(video))
+				exception.addLogMessage(logMessage = self.language(40300) % "video\n" + repr(video))
 				# "Error processing video"
 				exception.process(self.language(40300) % programme % "video\n", "", xbmc.LOGWARNING)
 				continue
