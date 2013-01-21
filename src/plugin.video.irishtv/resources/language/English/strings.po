@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2013-01-20 16:52+0000\n"
+"POT-Creation-Date: 2013-01-21 15:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE\n"
@@ -601,4 +601,10 @@ msgstr ""
 
 msgctxt "#40380"
 msgid "Error processing search result"
+msgstr ""
+
+#empty strings from id 40381 to 40389
+
+msgctxt "#40390"
+msgid "Error processing \"Show All\" menu"
 msgstr ""
