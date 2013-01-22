@@ -1,0 +1,25 @@
+[B]Version 0.2.3[/B]
+    * Removed obsolete filehoster: hotfile.com, fileserve.com, filesonic.com, megaupload.com, multiupload.com, wupload.com & oron.com
+    * New supported filehoster: bitshare.com
+    * New sub categories: Movies/Complete BluRay, Movies/RC, Ebooks/Magazines
+    * Fixed problem with fetching uploaded.to links
+
+[B]Version 0.2.2[/B]
+    * New supported filehoster: turbobit.net, ul.to, netload.in, depositfiles.com, filepost.com
+
+[B]Version 0.2.1[/B]
+    * Fixed problems with the new website design
+    * Ignore duplicate filehoster links
+    * New sub categories: HDRips & FLAC
+
+[B]Version 0.2.0[/B]
+    * Refactoring (Using now the library DDLScraper)
+    * New sub categories: Mac Applications & Windows Applications
+    * New supported filehoster: megaupload.com, multiupload.com, wupload.com, oron.com
+    * New setting: 'Alternative Filehoster 3' (due to the huge amount of filehoster)
+
+[B]Version 0.1.1[/B]
+    * Added search function
+
+[B]Version 0.1.0[/B]
+    * Initial release
