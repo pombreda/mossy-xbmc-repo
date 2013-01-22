@@ -1,31 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="plugin.video.icefilms"
-       name="Icefilms"
-       version="1.1.25"
-       provider-name="Eldorado (originator: anarchintosh)">
-    <requires>
-        <import addon="xbmc.python" version="2.0"/>
-        <import addon="script.module.simplejson"/>
-        <import addon="script.module.elementtree"/>
-        <import addon="script.module.beautifulsoup"/>
-        <import addon="script.module.metahandler" version="1.0.0"/>
-        <import addon="script.module.t0mm0.common" version="1.1.0"/>
-        <import addon="script.common.plugin.cache" version="0.9.0"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource"
-               library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <platform>all</platform>
-        <summary>Stream and download scene releases from the links listed on Icefilms.info</summary>
-        <description>Visit www.xbmchub.com for support.
-
-Turns your XBMC into an instant free on-demand media-center. Stream and download to your library pure AVI scene releases, in DVD and HD720p quality. Browse and search the library of over 77,000 videos with metadata and posters. Never experience the frustration of dead video links!</description>
-    </extension>
-</addon>
-
 <addon id="repository.mossy" name="Mossys Add-ons" version="1.0.5" provider-name="mossy">
 	<extension point="xbmc.addon.repository" name="Mossys Add-ons">
 		<info compressed="false">http://mossy-xbmc-repo.googlecode.com/git/test/addons.xml</info>
@@ -33,9 +7,31 @@ Turns your XBMC into an instant free on-demand media-center. Stream and download
 		<datadir zip="true">http://mossy-xbmc-repo.googlecode.com/git/test</datadir>
 	</extension>
 	<extension point="xbmc.addon.metadata">
-		<summary>Install Addons from http://anarchintosh-projects.googlecode.com</summary>
-		<description>Download and install addons from anarchintosh repository.</description>
+		<summary>Install add-ons from Mossys add-on repository</summary>
+		<description>Home of Irish TV Player &amp; 4oD</description>
 		<platform>all</platform>
 	</extension>
+</addon>
+
+<addon id="plugin.video.irishtv"
+       name="Irish TV"
+       version="1.0.1"
+       provider-name="mossy">
+    <requires>
+        <import addon="xbmc.python" version="2.0"/>
+        <import addon="script.module.pyamf" version="0.6.1"/>
+    	<import addon="script.module.beautifulsoup" version="3.2.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource"
+               library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+	<language>en</language>
+        <platform>all</platform>
+        <summary>Irish TV On Demand</summary>
+        <description>Irish TV On Demand. RTE, including live TV, TV3 and AerTV</description>
+	<disclaimer>May not work outside Ireland</disclaimer>
+    </extension>
 </addon>
 </addons>

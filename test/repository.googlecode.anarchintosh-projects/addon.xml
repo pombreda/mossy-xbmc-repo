@@ -6,9 +6,8 @@
 		<datadir zip="true">http://mossy-xbmc-repo.googlecode.com/git/test</datadir>
 	</extension>
 	<extension point="xbmc.addon.metadata">
-		<summary>Install Addons from http://anarchintosh-projects.googlecode.com</summary>
-		<description>Download and install addons from anarchintosh repository.</description>
+		<summary>Install add-ons from Mossys add-on repository</summary>
+		<description>Home of Irish TV Player &amp; 4oD</description>
 		<platform>all</platform>
 	</extension>
 </addon>
-
