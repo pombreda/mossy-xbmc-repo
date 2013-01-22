@@ -26,8 +26,8 @@ Turns your XBMC into an instant free on-demand media-center. Stream and download
     </extension>
 </addon>
 
-<addon id="repository.googlecode.anarchintosh-projects" name="anarchintosh addons" version="1.0.1" provider-name="anarchintosh">
-	<extension point="xbmc.addon.repository" name="anarchintosh add-on repository">
+<addon id="repository.mossy" name="Mossys Add-ons" version="1.0.5" provider-name="mossy">
+	<extension point="xbmc.addon.repository" name="Mossys Add-ons">
 		<info compressed="false">http://mossy-xbmc-repo.googlecode.com/git/test/addons.xml</info>
 		<checksum>http://mossy-xbmc-repo.googlecode.com/git/test/addons.xml.md5</checksum>
 		<datadir zip="true">http://mossy-xbmc-repo.googlecode.com/git/test</datadir>
