@@ -1,9 +1,0 @@
-[B]Version 0.1.2[/B]
-    * bug: fixed problem with scraping pages due to domain change: rlsbb.me -> rlsbb.com
-    * renamed plugin to RlsBB.com
-
-[B]Version 0.1.1[/B]
-    * bug: fixed default filehoster
-
-[B]Version 0.1.0[/B]
-    * Initial release
