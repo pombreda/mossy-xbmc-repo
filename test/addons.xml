@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
 <addon id="repository.mossy" name="Mossys Add-ons" version="1.0.5" provider-name="mossy">
-	<extension point="xbmc.addon.repository" name="Mossys Add-ons">
-		<info compressed="false">http://mossy-xbmc-repo.googlecode.com/git/test/addons.xml</info>
-		<checksum>http://mossy-xbmc-repo.googlecode.com/git/test/addons.xml.md5</checksum>
-		<datadir zip="true">http://mossy-xbmc-repo.googlecode.com/git/test</datadir>
-	</extension>
-	<extension point="xbmc.addon.metadata">
-		<summary>Install add-ons from Mossys add-on repository</summary>
-		<description>Home of Irish TV Player &amp; 4oD</description>
-		<platform>all</platform>
-	</extension>
+    <extension point="xbmc.addon.repository" name="Mossys Add-ons">
+        <info compressed="false">http://mossy-xbmc-repo.googlecode.com/git/addons.xml</info>
+        <checksum>http://mossy-xbmc-repo.googlecode.com/git/addons.xml.md5</checksum>
+        <datadir zip="true">http://mossy-xbmc-repo.googlecode.com/git</datadir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>Install add-ons from Mossys add-on repository</summary>
+        <description>Home of Irish TV Player &amp; 4oD</description>
+        <platform>all</platform>
+    </extension>
 </addon>
 
 <addon id="script.module.beautifulsoup"
@@ -33,7 +33,7 @@
 
 <addon id="plugin.video.irishtv"
        name="Irish TV"
-       version="1.0.2"
+       version="1.0.3"
        provider-name="mossy">
     <requires>
         <import addon="xbmc.python" version="2.0"/>
