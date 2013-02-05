@@ -22,7 +22,12 @@
   <string id="30330">Proxy Port</string>
   <string id="30340">Proxy Username</string>
   <string id="30350">Proxy Password</string>
+  <string id="30360">Method</string>
 
+  <string id="30370">Forwarded IP</string>
+  <string id="30371">Forwarded IP Segment 1 (e.g. 46.X.X.X)</string>
+  <string id="30372">Forwarded IP Segment 2 (e.g. X.7.X.X)</string>
+  
   <string id="30400">Advanced</string>
   <string id="30410">Use Youtube if video is not available on 4od</string>
   <string id="30420">Socket Timeout</string>
@@ -94,4 +99,7 @@
   <string id="30945">Wrong content delivery network</string>
   <string id="30950">cdn is not 'll'</string>
   <string id="30955">Error getting correct cdn, trying again</string>
+  <string id="30960">Error getting episode data "%s"</string>
+  <string id="30965">Error getting RTMP url</string>
+  <string id="30970">Error getting subtitles</string>
 </strings>

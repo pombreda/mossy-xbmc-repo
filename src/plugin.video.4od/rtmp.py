@@ -1,97 +1,171 @@
+# -*- coding: utf-8 -*-
 import xbmc
-from xbmc import log
-
-import utils
-
-__flashVer1__ = "WIN 11,2,202,243"
-__flashVer2__ = "WIN\\2011,2,202,243"
-__pageUrl__ = "http://www.channel4.com"
+import sys
 
 
 class RTMP:
-	def __init__(self):
-		self.url = None
-		self.auth = None
-                self.app = None
-                self.playPath = None
-                self.swfPlayer = None
+    def __init__(self, rtmp, auth = None, app = None, playPath = None, swfUrl = None, swfVfy = None, pageUrl = None, live = None):
+        if hasattr(sys.modules["__main__"], "log"):
+            self.log = sys.modules["__main__"].log
+        else:
+            from utils import log
+        
+        self.rtmp = rtmp
+        self.auth = auth
+        self.app = app
+        self.playPath = playPath
+        self.swfUrl = swfUrl
+        self.swfVfy = swfVfy
+        self.pageUrl = pageUrl
+        self.live = live
+        
+        self.rtmpdumpPath = None
+        self.downloadFolder = None
 
-		self.rtmpdumpPath = None
-                self.savePath = None
-		
-		self.pageUrl = __pageUrl__
+        self.language = sys.modules["__main__"].language
+    
 
-	def setDetailsFromURI(self, streamURI, auth, swfPlayer):
-		log('setDetailsFromURI streamURI: ' + streamURI, xbmc.LOGDEBUG)
-		log('setDetailsFromURI swfPlayer: ' + swfPlayer, xbmc.LOGDEBUG)
-
-		log('setDetailsFromURI auth: ' + auth, xbmc.LOGDEBUG)
-
-		(self.url, error) = utils.findString('setDetailsFromURI', '(.*?)mp4:', streamURI)##LL
-#		(self.url, error) = utils.findString('setDetailsFromURI', '(.*?)/mp4:', streamURI)##AK
-		if error is not None:
-			return error
-
-		self.url = self.url.replace( '.com/', '.com:1935/' )
-
-		(self.app, error) = utils.findString('setDetailsFromURI', '.com/(.*?)mp4:', streamURI)##LL
-#		(self.app, error) = utils.findString('setDetailsFromURI', '.com/(.*?)/mp4:', streamURI)##AK
-		if error is not None:
-			return error
-
-		##self.app = self.app + "?ovpfv=1.1&" + auth
-		self.app = self.app + "?" + auth
-
-		(self.playPath, error) = utils.findString('setDetailsFromURI', '(mp4:.*)', streamURI)
-		if error is not None:
-			return error
-
-		self.playPath = self.playPath + '?' + auth
-
-		self.swfPlayer = swfPlayer
-		self.auth = auth
-
-		log ("setDetailsFromURI url: " + self.url, xbmc.LOGDEBUG)
-		log ("setDetailsFromURI app: " + self.app, xbmc.LOGDEBUG)
-		log ("setDetailsFromURI playPath: " + self.playPath, xbmc.LOGDEBUG)
-		log ("setDetailsFromURI auth: " + self.auth, xbmc.LOGDEBUG)
-
-		return None
-
-	#def setDownloadPath(self, savePath):
-	#	self.savePath = savePath
-	def setDownloadDetails(self, rtmpdumpPath, savePath):
-                self.rtmpdumpPath = rtmpdumpPath
-		self.savePath = savePath
-	
-		log ("setDownloadDetails rtmpdumpPath: " + self.rtmpdumpPath, xbmc.LOGDEBUG)
+    def setDownloadDetails(self, rtmpdumpPath, downloadFolder):
+        self.rtmpdumpPath = rtmpdumpPath
+        self.downloadFolder = downloadFolder
+        
+        self.log (u"setDownloadDetails rtmpdumpPath: %s, downloadFolder: %s" % (self.rtmpdumpPath, self.downloadFolder), xbmc.LOGDEBUG)
 
 
-	def getParameters(self):
-		args = [
-			"--rtmp", '"%s"' % self.url,
-			"--app", '"%s"' % self.app,
-			"--flashVer", '"WIN 11,2,202,243"',
-			"--pageUrl", '"http://www.channel4.com"',
-			"--swfVfy", '"%s"' % self.swfPlayer,
-			"--conn", "Z:",
-			"--playpath", '"%s"' % self.playPath,
-			"-o", '"%s"' % self.savePath
-			]
+    def getDumpCommand(self):
+        if self.rtmpdumpPath is None or self.rtmpdumpPath == '':
+            # rtmpdump path is not set
+            exception = Exception(self.language(40000))
+            raise exception
 
-		command = ' '.join(args)
+        args = [ self.rtmpdumpPath ]
 
-		log("command: " + command, xbmc.LOGDEBUG)
-		return command
+        args.append(getParameters())
 
-	def getPlayUrl(self):
+        command = ' '.join(args)
 
-###		playURL = "%s?ovpfv=1.1&%s playpath=%s swfurl=%s swfvfy=true" % (self.url,self.auth,self.playPath,self.swfPlayer)
-		playURL = "%s?%s app=%s tcurl=%s playpath=%s swfurl=%s flashver=%s pageurl=%s swfvfy=true" % (self.url,self.auth, self.app, self.url,self.playPath,self.swfPlayer, __flashVer2__, self.pageUrl)
-###		playURL = "%s?%s playpath=%s swfurl=%s pageurl=%s swfvfy=true" % (self.url,self.auth,self.playPath,self.swfPlayer, self.pageUrl)
+        self.log(u"command: " + command, xbmc.LOGDEBUG)
+        return command
 
-		log("playURL: " + playURL, xbmc.LOGDEBUG)
-		return playURL
+    def getSimpleParameters(self):
+        if self.downloadFolder is None or self.downloadFolder == '':
+            # Download Folder is not set
+            exception = Exception(self.language(40010))
+            raise exception;
 
-	
+        if self.rtmp is None or self.rtmp == '':
+            # rtmp url is not set
+            exception = Exception(self.language(40020))
+            raise exception;
+
+        parameters = {}
+
+        parameters["url"] = self.rtmp
+        parameters["download_path"] = self.downloadFolder
+
+        if self.auth is not None:
+            parameters["auth"] = self.auth
+
+        if self.app is not None:
+            parameters["app"] = self.app
+
+        if self.playPath is not None:
+            parameters["playpath"] = self.playPath
+
+        if self.swfUrl is not None:
+            parameters["swfUrl"] = self.swfUrl
+
+        if self.swfVfy is not None:
+            parameters["swfVfy"] = self.swfVfy
+
+        if self.pageUrl is not None:
+            parameters["pageUrl"] = self.pageUrl
+
+        if self.live is not None:
+            parameters["live"] = "true"
+
+        self.log(u"parameters: " + unicode(parameters), xbmc.LOGDEBUG)
+        return parameters
+
+    def getParameters(self):
+        if self.downloadFolder is None or self.downloadFolder == '':
+            # Download Folder is not set
+            exception = Exception(self.language(40010))
+            raise exception;
+
+        if self.rtmp is None or self.rtmp == '':
+            # rtmp url is not set
+            exception = Exception(self.language(40020))
+            raise exception;
+
+        args = [ u"--rtmp", u'"%s"' % self.rtmp, u"-o", u'"%s"' % self.downloadFolder ]
+
+        if self.auth is not None:
+            args.append(u"--auth")
+            args.append(u'"%s"' % self.auth)
+
+        if self.app is not None:
+            args.append(u"--app")
+            args.append(u'"%s"' % self.app)
+
+        if self.playPath is not None:
+            args.append(u"--playpath")
+            args.append(u'"%s"' % self.playPath)
+
+        if self.swfUrl is not None:
+            args.append(u"--swfUrl")
+            args.append(u'"%s"' % self.swfUrl)
+
+        if self.swfVfy is not None:
+            args.append(u"--swfVfy")
+            args.append(u'"%s"' % self.swfVfy)
+
+        if self.pageUrl is not None:
+            args.append(u"--pageUrl")
+            args.append(u'"%s"' % self.pageUrl)
+
+        if self.live is not None:
+            args.append(u"--live")
+
+        parameters = u' '.join(args)
+
+        self.log(u"parameters: " + parameters, xbmc.LOGDEBUG)
+        return parameters
+
+    def getPlayUrl(self):
+        if self.rtmp is None or self.rtmp == '':
+            # rtmp url is not set
+            exception = Exception(self.language(40020))
+            raise exception;
+
+        args = [u"%s" % self.rtmp]
+
+        if self.auth is not None:
+            args.append(u"auth=%s" % self.auth)
+
+        if self.app is not None:
+            args.append(u"app=%s" % self.app)
+
+        if self.playPath is not None:
+            args.append(u"playpath=%s" % self.playPath)
+
+        if self.swfUrl is not None:
+            args.append(u"swfurl=%s" % self.swfUrl)
+
+        if self.swfVfy is not None:
+            args.append(u"swfurl=%s" % self.swfVfy)
+            args.append(u"swfvfy=true")
+
+        if self.pageUrl is not None:
+            args.append(u"pageurl=%s" % self.pageUrl)
+
+        if self.live is not None:
+            args.append(u"live=true")
+
+        playURL = u' '.join(args)
+
+        self.log(u"playURL: " + playURL, xbmc.LOGDEBUG)
+
+        return playURL
+
 

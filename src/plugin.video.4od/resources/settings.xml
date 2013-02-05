@@ -9,12 +9,13 @@
 
 	  <!-- Proxy -->
         <category label="30300">
-         <setting id="proxy_use" label="30310" type="bool" default="false" />
-         <setting id="proxy_type" label="30315" type="enum" values="HTTP|HTTP (Tunneled)|SOCKS4|SOCKS5" enable="eq(-1,true)" default="0" />
-         <setting id="proxy_server" label="30320" type="text" default="" enable="eq(-2,true)" />
-         <setting id="proxy_port" label="30330" type="number" default="" enable="eq(-3,true)" />
-         <setting id="proxy_user" label="30340" type="text" enable="eq(-4,true)"  />
-         <setting id="proxy_pass" label="30350" type="text" option="hidden" enable="!eq(-4,2) + eq(-5,true)" />
+         <setting id="4oD_proxy_method" label="30360" type="enum" values="None|Proxy" default="0" />
+         <setting type="sep"/>
+         <setting id="proxy_type" label="30315" type="enum" values="HTTP|HTTP (Tunneled)|SOCKS4|SOCKS5" enable="eq(-2,1)" default="0" />
+         <setting id="proxy_server" label="30320" type="text" enable="eq(-3,1)" default="" />
+         <setting id="proxy_port" label="30330" type="number" enable="eq(-4,1)" default="" />
+         <setting id="proxy_user" label="30340" type="text" enable="eq(-5,1)" />
+         <setting id="proxy_pass" label="30350" type="text" option="hidden" enable="eq(-6,1)" />
 	</category>
 
 	<!-- Downloads -->
@@ -27,13 +28,6 @@
 
 	<!-- Advanced -->
 	<category label="30400">
-	 <setting id="youtube_enable" type="bool" label="30410" default="true"/>
-	 <setting id="youtube_force_check" type="bool" label="30440" default="false" enable="eq(-1,true)" />
-
-	<!--
-	 <setting id="youtube_forced" type="bool" label="30430" default="false" enable="eq(-1,true)" />
-	-->
-
 	 <setting id="socket_timeout" type="number" label="30420" default="0"/>
 	 <setting id="http_cache_disable_adv" label="30170" type="bool" default="false" />
 	</category>

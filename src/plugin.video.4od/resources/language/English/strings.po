@@ -1,0 +1,596 @@
+# XBMC Media Center language file
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2013-02-05 20:11+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgctxt "#0"
+msgid "OK"
+msgstr ""
+
+#empty strings from id 1 to 30099
+
+msgctxt "#30100"
+msgid "General"
+msgstr ""
+
+#empty strings from id 30101 to 30109
+
+msgctxt "#30110"
+msgid "Default action on select"
+msgstr ""
+
+#empty strings from id 30111 to 30119
+
+msgctxt "#30120"
+msgid "Ask"
+msgstr ""
+
+#empty strings from id 30121 to 30129
+
+msgctxt "#30130"
+msgid "Play"
+msgstr ""
+
+#empty strings from id 30131 to 30139
+
+msgctxt "#30140"
+msgid "Download"
+msgstr ""
+
+#empty strings from id 30141 to 30149
+
+msgctxt "#30150"
+msgid "Use paging (list 50 programmes at a time)"
+msgstr ""
+
+#empty strings from id 30151 to 30159
+
+msgctxt "#30160"
+msgid "Subtitles"
+msgstr ""
+
+#empty strings from id 30161 to 30169
+
+msgctxt "#30170"
+msgid "Disable HTTP Cache"
+msgstr ""
+
+#empty strings from id 30171 to 30199
+
+msgctxt "#30200"
+msgid "Downloads"
+msgstr ""
+
+#empty strings from id 30201 to 30209
+
+msgctxt "#30210"
+msgid "Path to rtmpdump"
+msgstr ""
+
+#empty strings from id 30211 to 30219
+
+msgctxt "#30220"
+msgid "Default download folder"
+msgstr ""
+
+#empty strings from id 30221 to 30229
+
+msgctxt "#30230"
+msgid "Ask for folder"
+msgstr ""
+
+#empty strings from id 30231 to 30239
+
+msgctxt "#30240"
+msgid "Ask for filename"
+msgstr ""
+
+#empty strings from id 30241 to 30299
+
+msgctxt "#30300"
+msgid "Proxy"
+msgstr ""
+
+#empty strings from id 30301 to 30309
+
+msgctxt "#30310"
+msgid "Use Proxy"
+msgstr ""
+
+#empty strings from id 30311 to 30314
+
+msgctxt "#30315"
+msgid "Proxy Type"
+msgstr ""
+
+#empty strings from id 30316 to 30319
+
+msgctxt "#30320"
+msgid "Proxy Server/IP"
+msgstr ""
+
+#empty strings from id 30321 to 30329
+
+msgctxt "#30330"
+msgid "Proxy Port"
+msgstr ""
+
+#empty strings from id 30331 to 30339
+
+msgctxt "#30340"
+msgid "Proxy Username"
+msgstr ""
+
+#empty strings from id 30341 to 30349
+
+msgctxt "#30350"
+msgid "Proxy Password"
+msgstr ""
+
+#empty strings from id 30351 to 30359
+
+msgctxt "#30360"
+msgid "Method"
+msgstr ""
+
+#empty strings from id 30361 to 30369
+
+msgctxt "#30370"
+msgid "Forwarded IP"
+msgstr ""
+
+msgctxt "#30371"
+msgid "Forwarded IP Segment 1 (e.g. 46.X.X.X)"
+msgstr ""
+
+msgctxt "#30372"
+msgid "Forwarded IP Segment 2 (e.g. X.7.X.X)"
+msgstr ""
+
+#empty strings from id 30373 to 30399
+
+msgctxt "#30400"
+msgid "Advanced"
+msgstr ""
+
+#empty strings from id 30401 to 30409
+
+msgctxt "#30410"
+msgid "Use Youtube if video is not available on 4od"
+msgstr ""
+
+#empty strings from id 30411 to 30419
+
+msgctxt "#30420"
+msgid "Socket Timeout"
+msgstr ""
+
+#empty strings from id 30421 to 30429
+
+msgctxt "#30430"
+msgid "Use Youtube for all videos"
+msgstr ""
+
+#empty strings from id 30431 to 30439
+
+msgctxt "#30440"
+msgid "Show [Not on Youtube] for all recent episodes not on Youtube (can slow down episode listing)"
+msgstr ""
+
+#empty strings from id 30441 to 30499
+
+msgctxt "#30500"
+msgid "Search"
+msgstr ""
+
+#empty strings from id 30501 to 30509
+
+msgctxt "#30510"
+msgid "Page"
+msgstr ""
+
+#empty strings from id 30511 to 30519
+
+msgctxt "#30520"
+msgid "Unable to determine swfPlayer URL. Using default: "
+msgstr ""
+
+#empty strings from id 30521 to 30529
+
+msgctxt "#30530"
+msgid "Do you want to play or download?"
+msgstr ""
+
+#empty strings from id 30531 to 30539
+
+msgctxt "#30540"
+msgid "Playback Error"
+msgstr ""
+
+#empty strings from id 30541 to 30549
+
+msgctxt "#30550"
+msgid "Unable to find MP4 video file to play"
+msgstr ""
+
+#empty strings from id 30551 to 30559
+
+msgctxt "#30560"
+msgid "Download Error"
+msgstr ""
+
+#empty strings from id 30561 to 30569
+
+msgctxt "#30570"
+msgid "You have not located your rtmpdump executable.\n Please update the addon settings and try again."
+msgstr ""
+
+#empty strings from id 30571 to 30579
+
+msgctxt "#30580"
+msgid "You have not set the default download folder.\n Please update the addon settings and try again."
+msgstr ""
+
+#empty strings from id 30581 to 30589
+
+msgctxt "#30590"
+msgid "Save programme as..."
+msgstr ""
+
+#empty strings from id 30591 to 30599
+
+msgctxt "#30600"
+msgid "Save to folder..."
+msgstr ""
+
+#empty strings from id 30601 to 30609
+
+msgctxt "#30610"
+msgid "Starting download"
+msgstr ""
+
+#empty strings from id 30611 to 30619
+
+msgctxt "#30620"
+msgid "Download Finished"
+msgstr ""
+
+#empty strings from id 30621 to 30699
+
+msgctxt "#30700"
+msgid "See log for details"
+msgstr ""
+
+#empty strings from id 30701 to 30704
+
+msgctxt "#30705"
+msgid "Can't find pattern in string"
+msgstr ""
+
+#empty strings from id 30706 to 30709
+
+msgctxt "#30710"
+msgid "Can't determine genre"
+msgstr ""
+
+#empty strings from id 30711 to 30714
+
+msgctxt "#30715"
+msgid "Error getting image"
+msgstr ""
+
+#empty strings from id 30716 to 30719
+
+msgctxt "#30720"
+msgid "Error finding next page"
+msgstr ""
+
+#empty strings from id 30721 to 30724
+
+msgctxt "#30725"
+msgid "Cannot determine if this is the last page or not"
+msgstr ""
+
+#empty strings from id 30726 to 30729
+
+msgctxt "#30730"
+msgid "Exception resolving swfPlayer URL"
+msgstr ""
+
+#empty strings from id 30731 to 30734
+
+msgctxt "#30735"
+msgid "Error parsing html"
+msgstr ""
+
+#empty strings from id 30736 to 30739
+
+msgctxt "#30740"
+msgid "Cannot list episodes"
+msgstr ""
+
+#empty strings from id 30741 to 30744
+
+msgctxt "#30745"
+msgid "Cannot add show to \\"Now Playing\\""
+msgstr ""
+
+#empty strings from id 30746 to 30749
+
+msgctxt "#30750"
+msgid "Error parsing stream info"
+msgstr ""
+
+#empty strings from id 30751 to 30754
+
+msgctxt "#30755"
+msgid "Cannot proceed"
+msgstr ""
+
+#empty strings from id 30756 to 30759
+
+msgctxt "#30760"
+msgid "Cannot find show id"
+msgstr ""
+
+#empty strings from id 30761 to 30764
+
+msgctxt "#30765"
+msgid "Cannot show categories"
+msgstr ""
+
+#empty strings from id 30766 to 30769
+
+msgctxt "#30770"
+msgid "Error getting category web page"
+msgstr ""
+
+#empty strings from id 30771 to 30774
+
+msgctxt "#30775"
+msgid "Cannot show Most Popular/A-Z/Latest"
+msgstr ""
+
+#empty strings from id 30776 to 30779
+
+msgctxt "#30780"
+msgid "Error processing web page"
+msgstr ""
+
+#empty strings from id 30781 to 30784
+
+msgctxt "#30785"
+msgid "Cannot show category"
+msgstr ""
+
+#empty strings from id 30786 to 30789
+
+msgctxt "#30790"
+msgid "Error getting episode list web page"
+msgstr ""
+
+#empty strings from id 30791 to 30794
+
+msgctxt "#30795"
+msgid "Error getting category web page"
+msgstr ""
+
+#empty strings from id 30796 to 30799
+
+msgctxt "#30800"
+msgid "See previous error"
+msgstr ""
+
+#empty strings from id 30801 to 30804
+
+msgctxt "#30805"
+msgid "Error getting programme list web page"
+msgstr ""
+
+#empty strings from id 30806 to 30809
+
+msgctxt "#30810"
+msgid "Error getting stream info xml"
+msgstr ""
+
+#empty strings from id 30811 to 30814
+
+msgctxt "#30815"
+msgid "No MP4 found, probably HTTP Dynamic Streaming. Stream URI - %s. Note that US shows will not play and recent episodes may not be on Youtube yet."
+msgstr ""
+
+#empty strings from id 30816 to 30819
+
+msgctxt "#30820"
+msgid "Error getting youtube show page"
+msgstr ""
+
+#empty strings from id 30821 to 30824
+
+msgctxt "#30825"
+msgid "Error getting youtube season playlist page"
+msgstr ""
+
+#empty strings from id 30826 to 30829
+
+msgctxt "#30830"
+msgid "Cannot determine season and episode numbers"
+msgstr ""
+
+#empty strings from id 30831 to 30834
+
+msgctxt "#30835"
+msgid "Error getting search web page"
+msgstr ""
+
+#empty strings from id 30836 to 30839
+
+msgctxt "#30840"
+msgid "Error parsing web page"
+msgstr ""
+
+#empty strings from id 30841 to 30844
+
+msgctxt "#30845"
+msgid " (also unable to stream video from Youtube, see previous log msg)"
+msgstr ""
+
+#empty strings from id 30846 to 30849
+
+msgctxt "#30850"
+msgid "Error streaming video from Youtube"
+msgstr ""
+
+#empty strings from id 30851 to 30854
+
+msgctxt "#30855"
+msgid "It's possible that this programme is not available from 4od on Youtube (e.g. all US shows) or this episode is not avilable on Youtube yet"
+msgstr ""
+
+#empty strings from id 30856 to 30859
+
+msgctxt "#30860"
+msgid "Try again. Change the socket timeout in the plugin settings if you see this problem a lot"
+msgstr ""
+
+#empty strings from id 30861 to 30864
+
+msgctxt "#30865"
+msgid "Timeout occurred two times in a row"
+msgstr ""
+
+#empty strings from id 30866 to 30869
+
+msgctxt "#30870"
+msgid "Socket timed out"
+msgstr ""
+
+#empty strings from id 30871 to 30874
+
+msgctxt "#30875"
+msgid "Searching Youtube"
+msgstr ""
+
+#empty strings from id 30876 to 30879
+
+msgctxt "#30880"
+msgid "Error verifying Youtube page"
+msgstr ""
+
+#empty strings from id 30881 to 30884
+
+msgctxt "#30885"
+msgid "Looking for video on 4od"
+msgstr ""
+
+#empty strings from id 30886 to 30889
+
+msgctxt "#30890"
+msgid "Looking for video on Youtube"
+msgstr ""
+
+#empty strings from id 30891 to 30894
+
+msgctxt "#30895"
+msgid "Timed out - trying again"
+msgstr ""
+
+#empty strings from id 30896 to 30899
+
+msgctxt "#30900"
+msgid "Error getting episodePage from Youtube. youtube id: "
+msgstr ""
+
+#empty strings from id 30901 to 30904
+
+msgctxt "#30905"
+msgid "episodeCandidate: "
+msgstr ""
+
+#empty strings from id 30906 to 30909
+
+msgctxt "#30910"
+msgid "Searching Youtube..."
+msgstr ""
+
+#empty strings from id 30911 to 30914
+
+msgctxt "#30915"
+msgid "getYoutubeUrl seriesNumber: "
+msgstr ""
+
+#empty strings from id 30916 to 30919
+
+msgctxt "#30920"
+msgid "getYoutubeUrl episodeNumber: "
+msgstr ""
+
+#empty strings from id 30921 to 30924
+
+msgctxt "#30925"
+msgid "defaultFilename: "
+msgstr ""
+
+#empty strings from id 30926 to 30929
+
+msgctxt "#30930"
+msgid "Unable to find Youtube id"
+msgstr ""
+
+#empty strings from id 30931 to 30934
+
+msgctxt "#30935"
+msgid "Season %i, Episode %i"
+msgstr ""
+
+#empty strings from id 30936 to 30939
+
+msgctxt "#30940"
+msgid " and unable to stream from Youtube"
+msgstr ""
+
+#empty strings from id 30941 to 30944
+
+msgctxt "#30945"
+msgid "Wrong content delivery network"
+msgstr ""
+
+#empty strings from id 30946 to 30949
+
+msgctxt "#30950"
+msgid "cdn is not 'll'"
+msgstr ""
+
+#empty strings from id 30951 to 30954
+
+msgctxt "#30955"
+msgid "Error getting correct cdn, trying again"
+msgstr ""
+
+#empty strings from id 30956 to 30959
+
+msgctxt "#30960"
+msgid "Error getting episode data \"%s\""
+msgstr ""
+
+#empty strings from id 30961 to 30964
+
+msgctxt "#30965"
+msgid "Error getting RTMP url"
+msgstr ""
+
+#empty strings from id 30966 to 30969
+
+msgctxt "#30970"
+msgid "Error getting subtitles"
+msgstr ""
