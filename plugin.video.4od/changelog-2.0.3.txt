@@ -1,13 +1,10 @@
-Version 2.0.3 (06 Feb 2013)
+Version 3.0.3 (06 Feb 2013)
 - Fix bug - Forgot to specify BeautifulSoup depency
 
-Version 2.0.2 (06 Feb 2013)
-- Fix bug - Wrong socksipy dependency version number (Eden only)
-
-Version 2.0.1 (06 Feb 2013)
+Version 3.0.1 (06 Feb 2013)
 - Fix bug - only works if you have pyamf module installed
 
-Version 2.0.0 (06 Feb 2013)
+Version 3.0.0 (06 Feb 2013)
 - Working again, uses ps3.channel4.com
 
 Version 1.8.6 (12 Dec 2012)

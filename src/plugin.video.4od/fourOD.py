@@ -5,6 +5,7 @@ import time, random
 import simplejson
 import httplib, urllib
 import codecs
+import os
 
 from datetime import timedelta
 from datetime import date
@@ -559,7 +560,7 @@ class FourODProvider(Provider):
         xbmc.executebuiltin('XBMC.Notification(4oD %s, %s)' % ( self.language(30610), filename))
     
         self.log(u'"%s" %s' % (rtmpdumpPath, parameters))
-        if get_system_platform() == u'windows':
+        if sys.modules["__main__"].__platform__ == u'windows':
             p = Popen( parameters, executable=rtmpdumpPath, shell=True, stdout=PIPE, stderr=PIPE )
         else:
             cmdline = u'"%s" %s' % (rtmpdumpPath, parameters)
