@@ -4,8 +4,6 @@ from time import strftime,strptime
 import time, random
 import simplejson
 import httplib, urllib
-import pyamf
-from pyamf import remoting
 import codecs
 
 from datetime import timedelta
