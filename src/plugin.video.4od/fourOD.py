@@ -116,7 +116,7 @@ class FourODProvider(Provider):
                 match = re.search(pattern, id, re.DOTALL | re.IGNORECASE)
                 
                 categoryName = match.group(1)
-                label = entry[u'title'] + u' (' + unicode(entry['dc:relation.4oDProgrammeCount']) + u')' 
+                label = unicode(entry[u'title']) + u' (' + unicode(entry['dc:relation.4oDProgrammeCount']) + u')' 
                 newListItem = xbmcgui.ListItem( label=label )
                 
                 url = self.GetURLStart() + u'&category=' + mycgi.URLEscape(categoryName) + u'&title=' + mycgi.URLEscape(label) + u'&order=' + mycgi.URLEscape(u'/title') + u'&page=1'
@@ -308,7 +308,7 @@ class FourODProvider(Provider):
                 
                 showId = match.group(1)
                 thumbnail = entry['content']['thumbnail']['@url']
-                progTitle = entry['title']
+                progTitle = unicode(entry['title'])
                 progTitle = progTitle.replace( u'&amp;', u'&' )
                 progTitle = progTitle.replace( u'&pound;', u'£' )
                 synopsis = entry['summary']['$']

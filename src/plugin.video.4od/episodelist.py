@@ -258,7 +258,7 @@ class EpisodeDetail:
 			self.premieredDate = ""
 
 		try:
-			self.epTitle = entry[u'title']
+			self.epTitle = unicode(entry[u'title'])
 		except (Exception) as exception:
 			self.logException(exception, u'title')
 			self.epTitle = ""
