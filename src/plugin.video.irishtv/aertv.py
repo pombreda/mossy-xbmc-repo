@@ -12,6 +12,7 @@ from datetime import date
 from datetime import datetime
 import sys
 from urlparse import urljoin
+from mercurial.wireproto import stream
 
 if hasattr(sys.modules["__main__"], "xbmc"):
     xbmc = sys.modules["__main__"].xbmc
@@ -245,19 +246,22 @@ class AerTVProvider(BrightCoveProvider):
     
             viewExperienceUrl = urlRoot + '/#' + channel
             
+            #streamType = self.addon.getSetting( u'AerTV_stream_type' )
+            #self.log(u"Stream type setting: " + streamType)
+            
             try:
-                rtmpUrl = self.GetRtmpUrl(playerKey, viewExperienceUrl, playerId, contentRefId = channel)
-                self.log("rtmpUrl: %s" % rtmpUrl)
+                streamUrl = self.GetStreamUrl(playerKey, viewExperienceUrl, playerId, contentRefId = channel)
+                self.log("streamUrl: %s" % streamUrl)
             except (Exception) as exception:
                 if not isinstance(exception, LoggingException):
                     exception = LoggingException.fromException(exception)
     
                 self.log(" channel: %s" % channel)
                 if channel in channelToStream:
-                    rtmpUrl = defaultRTMPUrl + channelToStream[channel]
+                    streamUrl = defaultRTMPUrl + channelToStream[channel]
         
                     # Error getting rtmp url. Using default: %s
-                    exception.addLogMessage(self.language(40320) % rtmpUrl)
+                    exception.addLogMessage(self.language(40320) % streamUrl)
                     exception.printLogMessages(severity = xbmc.LOGWARNING)
                 else:
                     # Error getting rtmp url.
@@ -265,27 +269,29 @@ class AerTVProvider(BrightCoveProvider):
                     # Cannot play video stream
                     raise exception
                 
-
-            playPathIndex = rtmpUrl.index('&') + 1
-            playPath = rtmpUrl[playPathIndex:]
-            qsData = self.GetQSData(channel, playerId, publisherId, playerKey)
-            swfUrl = self.GetSwfUrl(qsData)
-            pageUrl = urlRoot
-            
-            if 'videoId' in playerJSON['data']:
-                videoId = playerJSON['data']['videoId']
-            else:
-                videoId = playerJSON['data']['offset']['videos'][0]
-                
-            app = "rtplive?videoId=%s&lineUpId=&pubId=%s&playerId=%s" % (videoId, publisherId, playerId)
-            rtmpVar = rtmp.RTMP(rtmp = rtmpUrl, app = app, swfUrl = swfUrl, playPath = playPath, pageUrl = pageUrl, live = True)
-            self.AddSocksToRTMP(rtmpVar)
-            
             # Set up info for "Now Playing" screen
             infoLabels, logo = self.GetInfoLabelsAndLogo(channel, epgUrl)
             
-            self.Play(infoLabels, logo, rtmpVar)            
-            
+            #RTMP
+            if streamUrl.upper().startswith(self.language(40671)):
+                playPathIndex = streamUrl.index('&') + 1
+                playPath = streamUrl[playPathIndex:]
+                qsData = self.GetQSData(channel, playerId, publisherId, playerKey)
+                swfUrl = self.GetSwfUrl(qsData)
+                pageUrl = urlRoot
+                
+                if 'videoId' in playerJSON['data']:
+                    videoId = playerJSON['data']['videoId']
+                else:
+                    videoId = playerJSON['data']['offset']['videos'][0]
+                    
+                app = "rtplive?videoId=%s&lineUpId=&pubId=%s&playerId=%s" % (videoId, publisherId, playerId)
+                rtmpVar = rtmp.RTMP(rtmp = streamUrl, app = app, swfUrl = swfUrl, playPath = playPath, pageUrl = pageUrl, live = True)
+                self.AddSocksToRTMP(rtmpVar)
+                
+                self.Play(infoLabels, logo, rtmpVar)            
+            else:
+                self.Play(infoLabels, logo, url = streamUrl)
             return True
        
         except (Exception) as exception:
@@ -332,40 +338,6 @@ class AerTVProvider(BrightCoveProvider):
         
         return epgJSON 
             
-    """
-    def GetRtmpUrl(self, key, contentRefId, url, playerId):
-        try:
-           response = None
-           response = self.GetEpisodeInfo(key, url, playerId, contentRefId = contentRefId)
-           name = response['name']
-           
-           self.log("Name field: " + name)
-           rtmpUrl = response['programmedContent']['videoPlayer']['mediaDTO']['FLVFullLengthURL']
-
-        except (Exception) as exception:
-            if not isinstance(exception, LoggingException):
-                exception = LoggingException.fromException(exception)
-
-            if response is not None:
-                msg = "response:\n\n%s\n\n" % repr(response)
-                exception.addLogMessage(msg)
-
-            if contentRefId in channelToStream:
-                rtmpUrl = defaultRTMPUrl + channelToStream[contentRefId]
-    
-                # Error getting rtmp url. Using default: %s
-                exception.addLogMessage(self.language(40320) % rtmpUrl)
-                exception.printLogMessages(severity = xbmc.LOGWARNING)
-            else:
-                # Error getting rtmp url.
-                exception.addLogMessage(self.language(40325))
-                # Cannot play video stream
-                raise exception
-
-                
-        return rtmpUrl
-
-    """
     """
     {
         'TTLToken': '',

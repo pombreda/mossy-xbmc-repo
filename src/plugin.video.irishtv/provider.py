@@ -12,6 +12,7 @@ from loggingexception import LoggingException
 from urlparse import urlunparse
 import HTMLParser
 
+from rtmp import RTMP
 
 if hasattr(sys.modules["__main__"], "xbmc"):
     xbmc = sys.modules["__main__"].xbmc
@@ -221,13 +222,13 @@ class Provider(object):
             proxyConfig = self.GetProxyConfig()
             rtmpVar.setProxyString(proxyConfig.toString())
         
-    def PlayOrDownloadEpisode(self, infoLabels, thumbnail, rtmpVar, defaultFilename):
+    def PlayOrDownloadEpisode(self, infoLabels, thumbnail, rtmpVar = None, defaultFilename = '', url = None):
         try:
             action = self.GetAction(infoLabels['Title'])
     
             if ( action == 1 ):
                 # Play
-                self.Play(infoLabels, thumbnail, rtmpVar)
+                self.Play(infoLabels, thumbnail, rtmpVar, url)
         
             else:
                 if ( action == 0 ):
@@ -243,7 +244,7 @@ class Provider(object):
             exception.process(self.language(40120), u'', self.logLevel(xbmc.LOGERROR))
             return False
     
-    def Play(self, infoLabels, thumbnail, rtmpVar):
+    def Play(self, infoLabels, thumbnail, rtmpVar = None, url = None):
         if infoLabels is None:
             self.log (u'Play titleId: Unknown Title')
             listItem = xbmcgui.ListItem(u'Unknown Title')
@@ -257,7 +258,11 @@ class Provider(object):
     
         play=xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         play.clear()
-        play.add(rtmpVar.getPlayUrl(), listItem)
+        
+        if url is None:
+            url = rtmpVar.getPlayUrl()
+            
+        play.add(url, listItem)
     
         xbmc.Player(xbmc.PLAYER_CORE_AUTO).play(play)
     

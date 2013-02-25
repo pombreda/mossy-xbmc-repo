@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2013-02-24 22:25+0000\n"
+"POT-Creation-Date: 2013-02-25 16:50+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE\n"
@@ -795,4 +795,18 @@ msgstr ""
 
 msgctxt "#40660"
 msgid "Now: Unknown, Next: "
+msgstr ""
+
+#empty strings from id 40661 to 40669
+
+msgctxt "#40670"
+msgid "[AerTV] Stream Type"
+msgstr ""
+
+msgctxt "#40671"
+msgid "RTMP"
+msgstr ""
+
+msgctxt "#40672"
+msgid "HTTP"
 msgstr ""

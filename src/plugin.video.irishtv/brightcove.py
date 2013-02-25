@@ -47,8 +47,8 @@ class BrightCoveProvider(Provider):
         self.useBitRateSetting = True
 
     def ChooseBitRate(self, preferredRate, renditions):
-        if len(renditions) < 2:
-            return None
+        #if len(renditions) < 2:
+        #    return None
 
         rates = {}
         for rendition in renditions:
@@ -56,10 +56,10 @@ class BrightCoveProvider(Provider):
         
         self.log("rates.keys(): %s" % rates.keys())
 
-        if 0 in rates:
-            del rates[0]
+        #if 0 in rates:
+        #    del rates[0]
 
-        if preferredRate == -1:
+        if preferredRate is None or preferredRate == -1:
             self.log("min(rates.keys()): %s" % min(rates.keys()))
             return rates[min(rates.keys())]['defaultURL']
 
@@ -76,7 +76,7 @@ class BrightCoveProvider(Provider):
 
         return rates[min(rates.keys())]['defaultURL']
 
-    def GetRtmpUrl(self, key, url, playerId, contentRefId = None, contentId = None):
+    def GetStreamUrl(self, key, url, playerId, contentRefId = None, contentId = None, streamType = "RTMP"):
         self.log("", xbmc.LOGDEBUG)
         try:
             self.amfResponse = None
@@ -89,20 +89,36 @@ class BrightCoveProvider(Provider):
            
             self.log("bitrate setting: %s" % preferredRate)
            
-            defaultRtmpUrl = self.amfResponse['programmedContent']['videoPlayer']['mediaDTO']['FLVFullLengthURL']
+            defaultStreamUrl = self.amfResponse['programmedContent']['videoPlayer']['mediaDTO']['FLVFullLengthURL']
 
-            self.log("defaultRtmpUrl: %s" % defaultRtmpUrl)
+            self.log("defaultStreamUrl: %s" % defaultStreamUrl)
            
-            if preferredRate is None:
-                return defaultRtmpUrl 
+            if preferredRate is None and defaultStreamUrl.upper().startswith(streamType):
+                return defaultStreamUrl 
 
-            renditions = self.amfResponse['programmedContent']['videoPlayer']['mediaDTO']['renditions']
+            originalRenditions = self.amfResponse['programmedContent']['videoPlayer']['mediaDTO']['renditions']
+            self.log("renditions: %s" % utils.drepr(originalRenditions))
+
+            renditions = []
+            renditionsOther = []
+            for rendition in originalRenditions:
+                if rendition['encodingRate'] == 0:
+                    continue
+                
+                if rendition['defaultURL'].upper().startswith(streamType):
+                    renditions.append(rendition)
+                else:
+                    renditionsOther.append(rendition)
+            
+            if len(renditions) == 0:
+                self.log("Unable to find stream of type '%s'" % streamType, xbmc.LOGWARNING)
+                renditions = renditionsOther
+
             self.log("renditions: %s" % utils.drepr(renditions))
-
             bitrate = self.ChooseBitRate(preferredRate, renditions)
 
             if bitrate == None:
-                return defaultRtmpUrl
+                return defaultStreamUrl
             
             return bitrate
 
