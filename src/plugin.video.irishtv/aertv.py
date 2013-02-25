@@ -37,6 +37,7 @@ import HTMLParser
 from BeautifulSoup import BeautifulSoup
 
 from provider import Provider
+from brightcove import BrightCoveProvider
 
 urlRoot     = u"http://www.aertv.ie"
 c_brightcove = u"http://c.brightcove.com"
@@ -57,7 +58,10 @@ channelToStream = {
                 u'rtejr' : u'RTEJUNIOR_v500.stream'
                 }
 
-class AerTVProvider(Provider):
+class AerTVProvider(BrightCoveProvider):
+
+    def __init__(self):
+        super(AerTVProvider, self).__init__()
 
     def GetProviderId(self):
         return u"AerTV"
@@ -77,11 +81,13 @@ class AerTVProvider(Provider):
         try:
             url = urlRoot + self.GetJSONPath()
             values = {'source':'ddl', 'length':'24', 'type':'basic'}
-            ddlJSONText = self.httpManager.GetWebPage(url, 7200, values = values).decode('utf8')
+            ddlJSONText = None
+            ddlJSONText = self.httpManager.GetWebPage(url, 7200, values = values)
     
             ddlJSONText = utils.extractJSON (ddlJSONText)
             ddlJSON = simplejson.loads(ddlJSONText)
 
+            epgJSON = None 
             epgJSON = self.GetEpgJSON(url)
 
             return self.ShowChannelList(url, ddlJSON, epgJSON)
@@ -90,6 +96,14 @@ class AerTVProvider(Provider):
             if not isinstance(exception, LoggingException):
                 exception = LoggingException.fromException(exception)
 
+            if ddlJSONText is not None:
+                msg = "ddlJSONText:\n\n%s\n\n" % ddlJSONText
+                exception.addLogMessage(msg)
+            
+            if epgJSON is not None:
+                msg = "epgJSON:\n\n%s\n\n" % repr(epgJSON)
+                exception.addLogMessage(msg)
+            
             # Error showing root menu
             exception.addLogMessage(self.language(40070))
             exception.process(severity = self.logLevel(xbmc.LOGERROR))
@@ -100,8 +114,8 @@ class AerTVProvider(Provider):
         (channel, url) = mycgi.Params( u'channel', u'url') 
        
         if channel <> '' and url <> '':
-            return self.PlayChannel(channel, url)
-        #    return self.PlayEpisode(episodeId.decode('utf8'))
+            #return self.PlayChannel(channel, url)
+            return self.PlayVideoWithDialog(self.PlayChannel, (channel, url))
 
 
     def ShowChannelList(self, url, ddlJSON, epgJSON):
@@ -219,7 +233,7 @@ class AerTVProvider(Provider):
             url = urlRoot + self.GetJSONPath()
             values = {'source':'player', 'type':'name', 'val':channel}
         
-            jsonData = self.httpManager.GetWebPage(url, 20000, values = values).decode('utf8')
+            jsonData = self.httpManager.GetWebPage(url, 20000, values = values)
     
             jsonText = utils.extractJSON (jsonData)
             playerJSON=simplejson.loads(jsonText)
@@ -229,11 +243,33 @@ class AerTVProvider(Provider):
             publisherId = playerJSON['data']['publisherId']
             playerKey = playerJSON['data']['playerKey']
     
-            rtmpUrl = self.GetRtmpUrl(playerKey, channel, urlRoot + '/#' + channel, playerId)
+            viewExperienceUrl = urlRoot + '/#' + channel
+            
+            try:
+                rtmpUrl = self.GetRtmpUrl(playerKey, viewExperienceUrl, playerId, contentRefId = channel)
+                self.log("rtmpUrl: %s" % rtmpUrl)
+            except (Exception) as exception:
+                if not isinstance(exception, LoggingException):
+                    exception = LoggingException.fromException(exception)
+    
+                self.log(" channel: %s" % channel)
+                if channel in channelToStream:
+                    rtmpUrl = defaultRTMPUrl + channelToStream[channel]
+        
+                    # Error getting rtmp url. Using default: %s
+                    exception.addLogMessage(self.language(40320) % rtmpUrl)
+                    exception.printLogMessages(severity = xbmc.LOGWARNING)
+                else:
+                    # Error getting rtmp url.
+                    exception.addLogMessage(self.language(40325))
+                    # Cannot play video stream
+                    raise exception
+                
 
             playPathIndex = rtmpUrl.index('&') + 1
             playPath = rtmpUrl[playPathIndex:]
-            swfUrl = self.get_swf_url(channel, playerId, publisherId, playerKey)
+            qsData = self.GetQSData(channel, playerId, publisherId, playerKey)
+            swfUrl = self.GetSwfUrl(qsData)
             pageUrl = urlRoot
             
             if 'videoId' in playerJSON['data']:
@@ -243,7 +279,8 @@ class AerTVProvider(Provider):
                 
             app = "rtplive?videoId=%s&lineUpId=&pubId=%s&playerId=%s" % (videoId, publisherId, playerId)
             rtmpVar = rtmp.RTMP(rtmp = rtmpUrl, app = app, swfUrl = swfUrl, playPath = playPath, pageUrl = pageUrl, live = True)
-
+            self.AddSocksToRTMP(rtmpVar)
+            
             # Set up info for "Now Playing" screen
             infoLabels, logo = self.GetInfoLabelsAndLogo(channel, epgUrl)
             
@@ -255,31 +292,16 @@ class AerTVProvider(Provider):
             if not isinstance(exception, LoggingException):
                 exception = LoggingException.fromException(exception)
 
+            if jsonText is not None:
+                msg = "jsonText:\n\n%s\n\n" % jsonText
+                exception.addLogMessage(msg)
+            
             # Error preparing or playing stream
             exception.addLogMessage(self.language(40340))
             exception.process(severity = self.logLevel(xbmc.LOGERROR))
             return False
 
 
-    def Play(self, infoLabels, thumbnail, rtmpVar):
-        if infoLabels is None:
-            self.log (u'Play titleId: Unknown Title')
-            listItem = xbmcgui.ListItem(u'Unknown Title')
-        else:
-            self.log (u'Play titleId: ' + infoLabels[u'Title'])
-            listItem = xbmcgui.ListItem(infoLabels[u'Title'])
-            listItem.setInfo(u'video', infoLabels)
-        
-        if thumbnail is not None:
-            listItem.setThumbnailImage(thumbnail)
-    
-        play=xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-        play.clear()
-        play.add(rtmpVar.getPlayUrl(), listItem)
-    
-        xbmc.Player(xbmc.PLAYER_CORE_AUTO).play(play)
-    
-            
     def GetInfoLabelsAndLogo(self, channel, epgUrl):
         infoLabels = None
         logo = None
@@ -303,29 +325,30 @@ class AerTVProvider(Provider):
         
     def GetEpgJSON(self, url):
         values = {'source':'epg', 'length':'24', 'type':'basic', 'check_account' : ''}
-        epgJSONText = self.httpManager.GetWebPage(url, 300, values = values).decode('utf8')
+        epgJSONText = self.httpManager.GetWebPage(url, 300, values = values)
 
         epgJSONText = utils.extractJSON (epgJSONText)
         epgJSON = simplejson.loads(epgJSONText)
         
         return epgJSON 
             
-        
+    """
     def GetRtmpUrl(self, key, contentRefId, url, playerId):
         try:
-           response = self.get_episode_info(key, contentRefId, url, playerId)
+           response = None
+           response = self.GetEpisodeInfo(key, url, playerId, contentRefId = contentRefId)
            name = response['name']
            
-           if -1 != name.find('BLOCKED'):
-               # Your IP seems to be BLOCKED by AerTV
-               self.log(self.language(40330), xbmc.LOGWARNING)
-                
            self.log("Name field: " + name)
            rtmpUrl = response['programmedContent']['videoPlayer']['mediaDTO']['FLVFullLengthURL']
 
         except (Exception) as exception:
             if not isinstance(exception, LoggingException):
                 exception = LoggingException.fromException(exception)
+
+            if response is not None:
+                msg = "response:\n\n%s\n\n" % repr(response)
+                exception.addLogMessage(msg)
 
             if contentRefId in channelToStream:
                 rtmpUrl = defaultRTMPUrl + channelToStream[contentRefId]
@@ -341,10 +364,37 @@ class AerTVProvider(Provider):
 
                 
         return rtmpUrl
+
+    """
+    """
+    {
+        'TTLToken': '',
+        'URL': u'https://www.aertv.ie/#rte-one',
+        'contentOverrides': [
+            {
+                'contentId': nan,
+                'contentIds': None,
+                'contentRefId': u'rte-one',
+                'contentRefIds': None,
+                'contentType': 0,
+                'featuredId': nan,
+                'featuredRefId': None,
+                'target': u'videoPlayer'
+            }
+        ],
+        'deliveryType': nan,
+        'experienceId': 1535624864001.0,
+        'playerKey': u'AQ~~,AAABIV9E_9E~,lGDQr89oSbJf6x1rDuEAWKPqTYfK-JH2'
+    },
+    u'a7ef6ffbfba938b174f5044af3343163a0877c48'
+    """
+    def GetAmfConst(self):
+        return 'a7ef6ffbfba938b174f5044af3343163a0877c48'
     
+    """
     #TODO Considering breaking out these methods into a separate class
     def get_episode_info(self, key, contentRefId, url, playerId):
-       envelope = self.build_amf_request(key, contentRefId, url, playerId)
+       envelope = self.BuildAmfRequest(key, contentRefId, url, playerId, self.GetAmfConst())
     
        self.log("POST c.brightcove.com/services/messagebroker/amf?playerKey=%s" % key, xbmc.LOGDEBUG)
        self.log("Log key: %s" % repr(key), xbmc.LOGDEBUG)    
@@ -377,8 +427,10 @@ class AerTVProvider(Provider):
           )
        )
        return env
+       """
 
-    def get_swf_url(self, videoPlayer, playerId, publisherId, playerKey):
+    def GetQSData(self, videoPlayer, playerId, publisherId, playerKey):
+        #TODO Use a default url, in case of exception and log response
         qsdata = {}
         qsdata['width'] = '100%'
         qsdata['height'] = '100%'
@@ -398,34 +450,10 @@ class AerTVProvider(Provider):
         qsdata['includeAPI'] = 'true'
         qsdata['debuggerID'] = ''
         qsdata['isUI'] = 'true'
+        
+        return qsdata
+    
+    #def get_swf_url(self, videoPlayer, playerId, publisherId, playerKey):
         #qsdata['startTime'] = '1358259433367'
-        url = c_brightcove + "/services/viewer/federated_f9?&" + urllib.urlencode(qsdata)
-        response = self.httpManager.GetHTTPResponse(url)
-
-        location = response.url
-        base = location.split("?",1)[0]
-        location = base.replace("BrightcoveBootloader.swf", "federatedVideoUI/BrightcoveBootloader.swf")
-        return location
     
-    
-class ViewerExperienceRequest(object):
-   def __init__(self, URL, contentOverrides, experienceId, playerKey, TTLToken=''):
-      self.TTLToken = TTLToken
-      self.URL = URL
-      self.deliveryType = float(0)
-      self.contentOverrides = contentOverrides
-      self.experienceId = experienceId
-      self.playerKey = playerKey
-
-class ContentOverride(object):
-   def __init__(self, contentRefId, contentType=0, contentRefIdtarget='videoPlayer'):
-      self.contentType = contentType
-      self.contentId = float(0)
-      self.target = contentRefIdtarget
-      self.contentIds = None
-      self.contentRefId = contentRefId
-      self.contentRefIds = None
-      self.contentType = 0
-      self.featureId = float(0)
-      self.featuredRefId = None
 

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2013-01-21 15:29+0000\n"
+"POT-Creation-Date: 2013-02-24 22:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE\n"
@@ -41,7 +41,61 @@ msgctxt "#20020"
 msgid "Can't find dropdown-programmes"
 msgstr ""
 
-#empty strings from id 20021 to 29999
+#empty strings from id 20021 to 20099
+
+msgctxt "#20100"
+msgid "RTE"
+msgstr ""
+
+msgctxt "#20101"
+msgid "TV3"
+msgstr ""
+
+msgctxt "#20102"
+msgid "AerTV"
+msgstr ""
+
+msgctxt "#20103"
+msgid "TG4"
+msgstr ""
+
+#empty strings from id 20104 to 24999
+
+msgctxt "#25000"
+msgid "Test failed"
+msgstr ""
+
+#empty strings from id 25001 to 25009
+
+msgctxt "#25010"
+msgid "Test passed"
+msgstr ""
+
+#empty strings from id 25011 to 25019
+
+msgctxt "#25020"
+msgid "Test inconclusive"
+msgstr ""
+
+#empty strings from id 25021 to 25029
+
+msgctxt "#25030"
+msgid "X-Forwarded-For header not received by website"
+msgstr ""
+
+#empty strings from id 25031 to 25039
+
+msgctxt "#25040"
+msgid "X-Forwarded-For header received as "
+msgstr ""
+
+#empty strings from id 25041 to 25049
+
+msgctxt "#25050"
+msgid "Error processing web page, see log for details."
+msgstr ""
+
+#empty strings from id 25051 to 29999
 
 msgctxt "#30000"
 msgid "ProviderFactory returned None for providerName: %s"
@@ -164,10 +218,22 @@ msgstr ""
 #empty strings from id 30241 to 30299
 
 msgctxt "#30300"
-msgid "Proxy / Forward IP"
+msgid "Proxy General"
 msgstr ""
 
-#empty strings from id 30301 to 30309
+#empty strings from id 30301 to 30304
+
+msgctxt "#30305"
+msgid "Proxy Per Service"
+msgstr ""
+
+#empty string with id 30306
+
+msgctxt "#30307"
+msgid "Proxy"
+msgstr ""
+
+#empty strings from id 30308 to 30309
 
 msgctxt "#30310"
 msgid "Use Proxy"
@@ -176,53 +242,47 @@ msgstr ""
 #empty strings from id 30311 to 30314
 
 msgctxt "#30315"
-msgid "Proxy Type"
+msgid "Type"
 msgstr ""
 
 #empty strings from id 30316 to 30319
 
 msgctxt "#30320"
-msgid "Proxy Server/IP"
+msgid "Server/IP"
 msgstr ""
 
 #empty strings from id 30321 to 30329
 
 msgctxt "#30330"
-msgid "Proxy Port"
+msgid "Port"
 msgstr ""
 
 #empty strings from id 30331 to 30339
 
 msgctxt "#30340"
-msgid "Proxy Username"
+msgid "Username"
 msgstr ""
 
 #empty strings from id 30341 to 30349
 
 msgctxt "#30350"
-msgid "Proxy Password"
+msgid "Password"
 msgstr ""
 
-#empty strings from id 30351 to 30359
-
-msgctxt "#30360"
-msgid "Method"
-msgstr ""
-
-#empty string with id 30361
+#empty strings from id 30351 to 30361
 
 msgctxt "#30362"
-msgid "IP Segment 1 (e.g. 46.X.X.X)"
+msgid "Segment 1 (e.g. 46.X.X.X)"
 msgstr ""
 
 msgctxt "#30363"
-msgid "IP Segment 2 (e.g. X.7.X.X)"
+msgid "Segment 2 (e.g. X.7.X.X)"
 msgstr ""
 
 #empty strings from id 30364 to 30369
 
 msgctxt "#30370"
-msgid "Forward IP"
+msgid "Forwarded IP"
 msgstr ""
 
 #empty strings from id 30371 to 30379
@@ -231,7 +291,21 @@ msgctxt "#30380"
 msgid "[RTE] Get programme descriptions (slows down episode listings)"
 msgstr ""
 
-#empty strings from id 30381 to 30399
+#empty strings from id 30381 to 30389
+
+msgctxt "#30390"
+msgid "[TG4] Language"
+msgstr ""
+
+msgctxt "#30391"
+msgid "Gaeilge"
+msgstr ""
+
+msgctxt "#30392"
+msgid "English"
+msgstr ""
+
+#empty strings from id 30393 to 30399
 
 msgctxt "#30400"
 msgid "Advanced"
@@ -333,7 +407,19 @@ msgctxt "#30715"
 msgid "Error getting image"
 msgstr ""
 
-#empty strings from id 30716 to 30754
+#empty strings from id 30716 to 30719
+
+msgctxt "#30720"
+msgid "HTTP Method"
+msgstr ""
+
+#empty strings from id 30721 to 30729
+
+msgctxt "#30730"
+msgid "Stream Method"
+msgstr ""
+
+#empty strings from id 30731 to 30754
 
 msgctxt "#30755"
 msgid "Cannot proceed"
@@ -606,5 +692,107 @@ msgstr ""
 #empty strings from id 40381 to 40389
 
 msgctxt "#40390"
-msgid "Error processing \"Show All\" menu"
+msgid "[AerTV, TG4] Bit rate"
+msgstr ""
+
+#empty strings from id 40391 to 40399
+
+msgctxt "#40400"
+msgid "Default"
+msgstr ""
+
+#empty strings from id 40401 to 40409
+
+msgctxt "#40410"
+msgid "Lowest Available"
+msgstr ""
+
+#empty strings from id 40411 to 40419
+
+msgctxt "#40420"
+msgid "Highest Available"
+msgstr ""
+
+#empty strings from id 40421 to 40429
+
+msgctxt "#40430"
+msgid "Max 200kps"
+msgstr ""
+
+#empty strings from id 40431 to 40439
+
+msgctxt "#40440"
+msgid "Max 350kps"
+msgstr ""
+
+#empty strings from id 40441 to 40449
+
+msgctxt "#40450"
+msgid "Max 500kps"
+msgstr ""
+
+#empty strings from id 40451 to 40459
+
+msgctxt "#40460"
+msgid "Max 750kps"
+msgstr ""
+
+#empty strings from id 40461 to 40469
+
+msgctxt "#40470"
+msgid "Max 1000kps"
+msgstr ""
+
+#empty strings from id 40471 to 40479
+
+msgctxt "#40480"
+msgid "Max 1500kps"
+msgstr ""
+
+#empty strings from id 40481 to 40489
+
+msgctxt "#40490"
+msgid "Max 2000kps"
+msgstr ""
+
+#empty strings from id 40491 to 40599
+
+msgctxt "#40600"
+msgid "Unable to determine qsdata. Using default values."
+msgstr ""
+
+#empty strings from id 40601 to 40609
+
+msgctxt "#40610"
+msgid "Error getting bit.ly API parameters. Using default values."
+msgstr ""
+
+#empty strings from id 40611 to 40619
+
+msgctxt "#40620"
+msgid "Error calling bit.ly API"
+msgstr ""
+
+#empty strings from id 40621 to 40629
+
+msgctxt "#40630"
+msgid "Error getting player url. Using default."
+msgstr ""
+
+#empty strings from id 40631 to 40639
+
+msgctxt "#40640"
+msgid "Preparing to play video"
+msgstr ""
+
+#empty strings from id 40641 to 40649
+
+msgctxt "#40650"
+msgid "Error getting live schedule"
+msgstr ""
+
+#empty strings from id 40651 to 40659
+
+msgctxt "#40660"
+msgid "Now: Unknown, Next: "
 msgstr ""

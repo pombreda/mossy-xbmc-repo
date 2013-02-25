@@ -6,6 +6,18 @@
   <string id="20000">Error getting %s Player Home page</string>
   <string id="20010">Cannot show RTE root menu</string>
   <string id="20020">Can't find dropdown-programmes</string>
+  
+  <string id="20100">RTE</string>
+  <string id="20101">TV3</string>
+  <string id="20102">AerTV</string>
+  <string id="20103">TG4</string>
+
+  <string id="25000">Test failed</string>
+  <string id="25010">Test passed</string>
+  <string id="25020">Test inconclusive</string>
+  <string id="25030">X-Forwarded-For header not received by website</string>
+  <string id="25040">X-Forwarded-For header received as </string>
+  <string id="25050">Error processing web page, see log for details.</string>
 
   <string id="30000">ProviderFactory returned None for providerName: %s</string>
   <string id="30010">Cannot show root menu</string>
@@ -30,18 +42,22 @@
   <string id="30230">Ask for folder</string>
   <string id="30240">Ask for filename</string>
 
-  <string id="30300">Proxy / Forward IP</string>
+  <string id="30300">Proxy General</string>
+  <string id="30305">Proxy Per Service</string>
+  <string id="30307">Proxy</string>
   <string id="30310">Use Proxy</string>
-  <string id="30315">Proxy Type</string>
-  <string id="30320">Proxy Server/IP</string>
-  <string id="30330">Proxy Port</string>
-  <string id="30340">Proxy Username</string>
-  <string id="30350">Proxy Password</string>
-  <string id="30360">Method</string>
-  <string id="30362">IP Segment 1 (e.g. 46.X.X.X)</string>
-  <string id="30363">IP Segment 2 (e.g. X.7.X.X)</string>
-  <string id="30370">Forward IP</string>
+  <string id="30315">Type</string>
+  <string id="30320">Server/IP</string>
+  <string id="30330">Port</string>
+  <string id="30340">Username</string>
+  <string id="30350">Password</string>
+  <string id="30362">Segment 1 (e.g. 46.X.X.X)</string>
+  <string id="30363">Segment 2 (e.g. X.7.X.X)</string>
+  <string id="30370">Forwarded IP</string>
   <string id="30380">[RTE] Get programme descriptions (slows down episode listings)</string>
+  <string id="30390">[TG4] Language</string>
+  <string id="30391">Gaeilge</string>
+  <string id="30392">English</string>
   <string id="30400">Advanced</string>
   <string id="30420">Socket Timeout</string>
 
@@ -60,6 +76,8 @@
   <string id="30705">Can't find pattern in string</string>
   <string id="30710">Can't determine genre</string>
   <string id="30715">Error getting image</string>
+  <string id="30720">HTTP Method</string>
+  <string id="30730">Stream Method</string>
 
   <string id="30755">Cannot proceed</string>
   <string id="30780">Error processing web page</string>
@@ -109,5 +127,23 @@
   <string id="40360">Cannot play video stream</string>
   <string id="40370">Error getting title and logo info for %s</string>
   <string id="40380">Error processing search result</string>
+  <string id="40390">[AerTV, TG4] Bit rate</string>
+  <string id="40400">Default</string>
+  <string id="40410">Lowest Available</string>
+  <string id="40420">Highest Available</string>
+  <string id="40430">Max 200kps</string>
+  <string id="40440">Max 350kps</string>
+  <string id="40450">Max 500kps</string>
+  <string id="40460">Max 750kps</string>
+  <string id="40470">Max 1000kps</string>
+  <string id="40480">Max 1500kps</string>
+  <string id="40490">Max 2000kps</string>
+  <string id="40600">Unable to determine qsdata. Using default values.</string>
+  <string id="40610">Error getting bit.ly API parameters. Using default values.</string>
+  <string id="40620">Error calling bit.ly API</string>
+  <string id="40630">Error getting player url. Using default.</string>
+  <string id="40640">Preparing to play video</string>
+  <string id="40650">Error getting live schedule</string>
+  <string id="40660">Now: Unknown, Next: </string>
 </strings>
 

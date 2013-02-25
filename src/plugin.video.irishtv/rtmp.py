@@ -4,13 +4,14 @@ import sys
 
 
 class RTMP:
-    def __init__(self, rtmp, auth = None, app = None, playPath = None, swfUrl = None, swfVfy = None, pageUrl = None, live = None):
+    def __init__(self, rtmp, tcUrl = None, auth = None, app = None, playPath = None, swfUrl = None, swfVfy = None, pageUrl = None, live = None, socks = None):
         if hasattr(sys.modules["__main__"], "log"):
             self.log = sys.modules["__main__"].log
         else:
             from utils import log
         
         self.rtmp = rtmp
+        self.tcUrl = tcUrl
         self.auth = auth
         self.app = app
         self.playPath = playPath
@@ -18,13 +19,17 @@ class RTMP:
         self.swfVfy = swfVfy
         self.pageUrl = pageUrl
         self.live = live
+        self.socks = socks
         
         self.rtmpdumpPath = None
         self.downloadFolder = None
 
         self.language = sys.modules["__main__"].language
     
-
+    # hostname:port
+    def setProxyString(self, string):
+        self.socks = string
+        
     def setDownloadDetails(self, rtmpdumpPath, downloadFolder):
         self.rtmpdumpPath = rtmpdumpPath
         self.downloadFolder = downloadFolder
@@ -72,6 +77,9 @@ class RTMP:
         if self.playPath is not None:
             parameters["playpath"] = self.playPath
 
+        if self.tcUrl is not None:
+            parameters["tcUrl"] = self.tcUrl
+
         if self.swfUrl is not None:
             parameters["swfUrl"] = self.swfUrl
 
@@ -81,8 +89,11 @@ class RTMP:
         if self.pageUrl is not None:
             parameters["pageUrl"] = self.pageUrl
 
-        if self.live is not None:
+        if self.live is not None and self.live is not False:
             parameters["live"] = "true"
+
+        if self.socks is not None:
+            parameters["socks"] = self.socks
 
         self.log(u"parameters: " + unicode(parameters), xbmc.LOGDEBUG)
         return parameters
@@ -116,6 +127,10 @@ class RTMP:
             args.append(u"--swfUrl")
             args.append(u'"%s"' % self.swfUrl)
 
+        if self.tcUrl is not None:
+            args.append(u"--tcUrl")
+            args.append(u'"%s"' % self.tcUrl)
+
         if self.swfVfy is not None:
             args.append(u"--swfVfy")
             args.append(u'"%s"' % self.swfVfy)
@@ -124,8 +139,12 @@ class RTMP:
             args.append(u"--pageUrl")
             args.append(u'"%s"' % self.pageUrl)
 
-        if self.live is not None:
+        if self.live is not None and self.live is not False:
             args.append(u"--live")
+
+        if self.socks is not None:
+            args.append(u"--socks")
+            args.append(u'"%s"' % self.socks)
 
         parameters = u' '.join(args)
 
@@ -152,6 +171,9 @@ class RTMP:
         if self.swfUrl is not None:
             args.append(u"swfurl=%s" % self.swfUrl)
 
+        if self.tcUrl is not None:
+            args.append(u"tcUrl=%s" % self.tcUrl)
+
         if self.swfVfy is not None:
             args.append(u"swfurl=%s" % self.swfVfy)
             args.append(u"swfvfy=true")
@@ -159,8 +181,11 @@ class RTMP:
         if self.pageUrl is not None:
             args.append(u"pageurl=%s" % self.pageUrl)
 
-        if self.live is not None:
+        if self.live is not None and self.live is not False:
             args.append(u"live=true")
+
+        if self.socks is not None:
+            args.append(u"socks=%s" % self.socks)
 
         playURL = u' '.join(args)
 

@@ -1,7 +1,7 @@
 #/bin/python
 # -*- coding: utf-8 -*-
 
-"""
+
 # http://wiki.xbmc.org/index.php?title=How-to:Debug_Python_Scripts_with_Eclipse
 
 REMOTE_DBG = False
@@ -20,7 +20,7 @@ if REMOTE_DBG:
 		sys.stderr.write("Error: " +
 			"You must add org.python.pydev.debug.pysrc to your PYTHONPATH.")
 		sys.exit(1)
-"""
+
 
 import os
 import xbmcplugin
@@ -30,6 +30,7 @@ import re
 
 from xbmcaddon import Addon
 from loggingexception import LoggingException
+from BeautifulSoup import BeautifulSoup
 
 
 pluginName  = u'plugin.video.irishtv'
@@ -41,7 +42,6 @@ language = addon.getLocalizedString
 
 import mycgi
 
-from loggingexception import LoggingException
 from httpmanager import HttpManager
 
 dbg = addon.getSetting("debug") == "true"
@@ -55,9 +55,11 @@ import utils
 import rtmp
 
 import providerfactory
-
+from provider import Provider
 #import SimpleDownloader
 #__downloader__ = SimpleDownloader.SimpleDownloader()
+xhausUrl = "http://www.xhaus.com/headers"
+
 httpManager = HttpManager()
 
 
@@ -89,7 +91,12 @@ __platform__	 = get_system_platform()
 
 def ShowProviders():
 	listItems = []
+	contextMenuItems = []
+	contextMenuItems.append(('Clear HTTP Cache', "XBMC.RunPlugin(%s?clearcache=1)" % sys.argv[0] ))
+	contextMenuItems.append(('Test Forwarded IP', "XBMC.RunPlugin(%s?testforwardedip=1)" % sys.argv[0] ))
+	
 	providers = providerfactory.getProviderList()
+
 
 	for provider in providers:
 		providerName = provider.GetProviderId()
@@ -101,6 +108,7 @@ def ShowProviders():
 		thumbnailPath = provider.GetThumbnailPath(providerName)
 		log(providerName + u" thumbnail: " + thumbnailPath, xbmc.LOGDEBUG)
 		newListItem.setThumbnailImage(thumbnailPath)
+		newListItem.addContextMenuItems( contextMenuItems )
 		listItems.append( (url,newListItem,True) )
 	
 
@@ -121,31 +129,79 @@ def InitTimeout():
 		except:
 			setdefaulttimeout(None)
 
+def TestForwardedIP(forwardedIP):
+	try:
+		html = None
+		log(u"TestForwardedIP: " + forwardedIP)
+		httpManager.EnableForwardedForIP()
+		httpManager.SetForwardedForIP( forwardedIP )
+		html = httpManager.GetWebPageDirect( xhausUrl )
+		
+		soup = BeautifulSoup(html)
+		xForwardedForString = soup.find(text='X-Forwarded-For')
+		
+		if xForwardedForString is None:
+			dialog = xbmcgui.Dialog()
+			dialog.ok(language(25000), language(25030))
+		else:
+			forwardedForIP = xForwardedForString.parent.findNextSibling('td').text
+			
+			dialog = xbmcgui.Dialog()
+			dialog.ok(language(25010), language(25040) + forwardedForIP)
+			
+		return True
+		
+	except (Exception) as exception:
+		if not isinstance(exception, LoggingException):
+			exception = LoggingException.fromException(exception)
+
+		dialog = xbmcgui.Dialog()
+		dialog.ok(language(25020), language(25050))
+		
+		# Error getting web page
+		exception.addLogMessage(language(30050))
+		exception.printLogMessages(xbmc.LOGERROR)
+		return False
+
+
+	
 #==============================================================================
 def executeCommand():
 	success = False
 	if ( mycgi.EmptyQS() ):
 		success = ShowProviders()
 	else:
-		providerName = mycgi.Param( u'provider' ).decode('utf8')
+		(providerName, clearCache, testForwardedIP) = mycgi.Params( u'provider', u'clearcache', u'testforwardedip' )
+		
+		if clearCache != u'':
+			httpManager.ClearCache()
+			return True
+		
+		elif testForwardedIP != u'':
+			provider = Provider()
+			provider.addon = sys.modules[u"__main__"].addon
 
-		log(u"providerName: " + providerName, xbmc.LOGDEBUG)
-		if providerName <> u'':
-			provider = providerfactory.getProvider(providerName)
+			httpManager.SetDefaultHeaders( provider.GetHeaders() )
+			forwardedIP = provider.CreateForwardedForIP('0.0.0.0')
 			
-			if provider is None:
-				# ProviderFactory return none for providerName: %s
-				logException = LoggingException(language(30000) % providerName)
-				# 'Cannot proceed', Error processing provider name
-				logException.process(language(30755), language(30020), xbmc.LOGERROR)
-				return False
+			return TestForwardedIP(forwardedIP)
 			
-			provider.initialise(httpManager, sys.argv[0], pluginHandle)
-			success = provider.ExecuteCommand(mycgi)
-			log (u"executeCommand done", xbmc.LOGDEBUG)
+		elif providerName != u'':
+			log(u"providerName: " + providerName, xbmc.LOGDEBUG)
+			if providerName <> u'':
+				provider = providerfactory.getProvider(providerName)
+				
+				if provider is None:
+					# ProviderFactory return none for providerName: %s
+					logException = LoggingException(language(30000) % providerName)
+					# 'Cannot proceed', Error processing provider name
+					logException.process(language(30755), language(30020), xbmc.LOGERROR)
+					return False
+				
+				provider.initialise(httpManager, sys.argv[0], pluginHandle)
+				success = provider.ExecuteCommand(mycgi)
+				log (u"executeCommand done", xbmc.LOGDEBUG)
 			
-		# else throw Exception
-
 
 	return success
 #		if ( search <> '' ):

@@ -60,10 +60,11 @@
 
 <addon id="plugin.video.irishtv"
        name="Irish TV"
-       version="1.0.1"
+       version="2.0.2"
        provider-name="mossy">
     <requires>
-        <import addon="xbmc.python" version="2.0"/>
+        <import addon="xbmc.python" version="2.1.0"/>
+        <import addon="script.module.socksipy" version="2.0.0"/>
         <import addon="script.module.pyamf" version="0.6.1"/>
     	<import addon="script.module.beautifulsoup" version="3.2.0"/>
     </requires>
@@ -75,7 +76,7 @@
 	<language>en</language>
         <platform>all</platform>
         <summary>Irish TV On Demand</summary>
-        <description>Irish TV On Demand. RTE, including live TV, TV3 and AerTV</description>
+        <description>Irish TV On Demand. RTE, TV3, AerTV, TG4</description>
 	<disclaimer>May not work outside Ireland</disclaimer>
     </extension>
 </addon>
