@@ -145,5 +145,8 @@
   <string id="40640">Preparing to play video</string>
   <string id="40650">Error getting live schedule</string>
   <string id="40660">Now: Unknown, Next: </string>
+  <string id="40670">[AerTV] Stream Type</string>
+  <string id="40671">RTMP</string>
+  <string id="40672">HTTP</string>
 </strings>
 

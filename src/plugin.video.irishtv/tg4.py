@@ -80,7 +80,7 @@ class TG4Provider(BrightCoveProvider):
 
     def ExecuteCommand(self, mycgi):
         self.log(u"Language: " + self.addon.getSetting( u'TG4_language' ))
-        if self.addon.getSetting( u'TG4_language' ) == self.language(30391) or self.addon.getSetting( u'TG4_language' ) == 30391 or self.addon.getSetting( u'TG4_language' ) == '30391':
+        if self.addon.getSetting( u'TG4_language' ) == self.language(30391):
             self.languageCode = u"ie"
         else:
             self.languageCode = u"en"
@@ -608,7 +608,7 @@ class TG4Provider(BrightCoveProvider):
             playerId = qsData[u'playerId']
             playerKey = qsData[u'playerKey']
             
-            rtmpUrl = self.GetRtmpUrl(playerKey, playerUrl, playerId, contentId = episodeId)
+            rtmpUrl = self.GetStreamUrl(playerKey, playerUrl, playerId, contentId = episodeId)
             
             publisherId = unicode(int(float(self.amfResponse[u'publisherId']))) 
             

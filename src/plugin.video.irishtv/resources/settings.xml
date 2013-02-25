@@ -4,8 +4,9 @@
 	<category label="30100">
 	 <setting id="select_action" type="labelenum" label="30110" default="Play" lvalues="30120|30130|30140"/>
 	 <setting id="bitrate" type="labelenum" label="40390" default="Default" lvalues="40400|40410|40420|40430|40440|40450|40460|40470|40480|40490"/>
-     <setting id="RTE_descriptions" type="bool" label="30380" default="false"/>
+<!--     <setting id="AerTV_stream_type" type="labelenum" label="40670" default="RTMP" lvalues="40671|40672"/>-->
      <setting id="TG4_language" type="labelenum" label="30390" default="Gaeilge" lvalues="30391|30392"/>
+     <setting id="RTE_descriptions" type="bool" label="30380" default="false"/>
 	<!-- <setting id="subtitles" type="bool" label="30160" default="false"/>-->
 	</category>
 
