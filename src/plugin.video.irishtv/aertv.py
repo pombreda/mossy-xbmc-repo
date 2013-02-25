@@ -12,7 +12,6 @@ from datetime import date
 from datetime import datetime
 import sys
 from urlparse import urljoin
-from mercurial.wireproto import stream
 
 if hasattr(sys.modules["__main__"], "xbmc"):
     xbmc = sys.modules["__main__"].xbmc
@@ -43,7 +42,7 @@ from brightcove import BrightCoveProvider
 urlRoot     = u"http://www.aertv.ie"
 c_brightcove = u"http://c.brightcove.com"
 
-# Default values only used if we can't get the info from the net, e.g. GEO-BLOCKEDonly used if we can't get the info from the net, e.g. GEO-BLOCKEDonly used if we can't get the info from the net, e.g. GEO-BLOCKED
+# Default values only used if we can't get the info from the net, e.g. only used if we can't get the info from the net
 defaultRTMPUrl = u"rtmpe://85.91.5.163:1935/rtplive&" 
 
 # RTMP stub 

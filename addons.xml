@@ -60,7 +60,7 @@
 
 <addon id="plugin.video.irishtv"
        name="Irish TV"
-       version="1.0.3"
+       version="1.0.4"
        provider-name="mossy">
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
