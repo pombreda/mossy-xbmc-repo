@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
+#TODO Verify all language strings here work in 4oD too
 import os
 import sys
 import re
+import random
+import socks
+import proxyconfig
+import unicodedata
 
 from loggingexception import LoggingException
 from urlparse import urlunparse
@@ -13,24 +18,27 @@ if hasattr(sys.modules["__main__"], "xbmc"):
 else:
     import xbmc
 
-#from xbmc import log
-
-
 if hasattr(sys.modules["__main__"], "xbmcgui"):
     xbmcgui = sys.modules["__main__"].xbmcgui
 else:
     import xbmcgui
 
-#import SimpleDownloader
-
 from subprocess import Popen, PIPE, STDOUT
 import mycgi
 import utils
+
+METHOD_IP_FORWARD = 1
+METHOD_PROXY = 2
+METHOD_PROXY_STREAMS = 3
+
+countryInfoUrl = "http://api.hostip.info/country.php"
 
 #__downloader__ = SimpleDownloader.SimpleDownloader()
 class Provider(object):
 
     def __init__(self):
+        self.proxy = None
+        self.useBitRateSetting = False
         if hasattr(sys.modules["__main__"], "log"):
             self.log = sys.modules["__main__"].log
         else:
@@ -39,28 +47,143 @@ class Provider(object):
 
             self.log("")
 
+
+    def CreateForwardedForIP(self, currentForwardedForIP):
+        currentSegments = currentForwardedForIP.split('.')
+        
+        ipSegment1 = int(float(self.addon.getSetting(u'forward_segment1')))
+        ipSegment2 = int(float(self.addon.getSetting(u'forward_segment2')))
+
+        if len(currentSegments) == 4 and int(currentSegments[0]) == ipSegment1 and int(currentSegments[1]) == ipSegment2:
+            # Settings haven't changed, return the current ip
+            return currentForwardedForIP
+        
+        forwardedForIP = '%d.%d.%d.%d' % (ipSegment1, ipSegment2, random.randint(0, 255), random.randint(0, 254)) 
+ 
+        return forwardedForIP 
+
     """
     If there is exactly one parameter then we are showing a provider's root menu
     otherwise we need to look at the other parameters to see what we need to do
     """
     def ExecuteCommand(self, mycgi):
         self.log(u"mycgi.ParamCount(): " + unicode(mycgi.ParamCount()), xbmc.LOGDEBUG)
+        forwardedIP = mycgi.Param( u'forwardedip' )
+        
+        if self.httpManager.GetIsForwardedForIP():
+             forwardedIP = self.CreateForwardedForIP(forwardedIP)
+             
+        if forwardedIP <> u'':
+            self.httpManager.SetForwardedForIP( forwardedIP )
+ 
         if mycgi.ParamCount() > 1:
             return self.ParseCommand(mycgi)
             ##return True
         else:
+            #self.ShowLocationInfo()
             return self.ShowRootMenu()
-
+    
+    def ShowLocationInfo(self):
+        try:
+            html = None
+            html = self.httpManager.GetWebPageDirect(countryInfoUrl)
+    
+            self.log(u"Country code: " + html)
+        except (Exception) as exception:
+            self.log(u"Exception getting country code: " + repr(exception))
+            
+            
     def initialise(self, httpManager, baseurl, pluginhandle):
-        self.httpManager = httpManager
         self.baseurl = baseurl
         self.pluginhandle = pluginhandle
         self.addon = sys.modules[u"__main__"].addon
         self.language = sys.modules[u"__main__"].language
+        
+        self.InitialiseHTTP(httpManager)
+        
+    def GetProxyConfig(self):
+
+        proxy_server = None
+        proxy_type_id = 0
+        proxy_port = 8080
+        proxy_user = None
+        proxy_pass = None
+        try:
+            proxy_server = self.addon.getSetting(u'proxy_server')
+            proxy_type_id = self.addon.getSetting(u'proxy_type')
+            proxy_port = int(self.addon.getSetting(u'proxy_port'))
+            proxy_user = self.addon.getSetting(u'proxy_user')
+            proxy_pass = self.addon.getSetting(u'proxy_pass')
+        except ( Exception ) as exception:
+            raise exception
+    
+        if   proxy_type_id == u'0': proxy_type = socks.PROXY_TYPE_HTTP_NO_TUNNEL
+        elif proxy_type_id == u'1': proxy_type = socks.PROXY_TYPE_HTTP
+        elif proxy_type_id == u'2': proxy_type = socks.PROXY_TYPE_SOCKS4
+        elif proxy_type_id == u'3': proxy_type = socks.PROXY_TYPE_SOCKS5
+    
+        proxy_dns = True
+    
+        if proxy_user == u'':
+            proxy_user = None
+    
+        if proxy_pass == u'':
+            proxy_pass = None
+
+        proxyConfig = proxyconfig.ProxyConfig( proxy_type, proxy_server, proxy_port, proxy_dns, proxy_user, proxy_pass)
+        
+        return proxyConfig
+    
+        
+    def InitialiseHTTP(self, httpManager):
+        self.httpManager = httpManager
+        self.httpManager.SetDefaultHeaders( self.GetHeaders() )
+
+        proxy_method = int(self.addon.getSetting(self.GetProviderId() + u'_proxy_method')) 
+        if proxy_method == METHOD_PROXY or proxy_method == METHOD_PROXY_STREAMS:
+            proxyConfig = self.GetProxyConfig()
+            self.httpManager.SetProxyConfig( proxyConfig )
+        elif proxy_method == METHOD_IP_FORWARD:
+            self.httpManager.EnableForwardedForIP()
+
+    def GetBitRateSetting(self):
+        if self.useBitRateSetting is False:
+            return None
+        
+        bitRates = {
+            self.language(40400):None,           #Default
+            self.language(40410):-1,             #Lowest Available
+            self.language(40430):200 * 1024,     #Max 200kps
+            self.language(40440):350 * 1024,     #Max 350kps
+            self.language(40450):500 * 1024,     #Max 500kps
+            self.language(40460):750 * 1024,     #Max 750kps
+            self.language(40470):1000 * 1024,    #Max 1000kps
+            self.language(40480):1500 * 1024,    #Max 1500kps
+            self.language(40490):2000 * 1024,    #Max 2000kps
+            self.language(40420):20000 * 1024    #Highest Available
+            }
+
+        bitrate_string = self.addon.getSetting(u'bitrate')
+        
+        return bitRates[bitrate_string]
+
 
     def GetURLStart(self):
-        return self.baseurl + u'?provider=' + self.GetProviderId()
+        urlStart = self.baseurl + u'?provider=' + self.GetProviderId() 
+        forwardedIP = self.httpManager.GetForwardedForIP()
+        if forwardedIP is not None:
+            urlStart = urlStart + u'&forwardedip=' + forwardedIP
+             
+        return urlStart
     
+    def GetHeaders(self):
+        # Windows 8, Internet Explorer 10
+        headers = {
+                   'User-Agent' : "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)",
+                   'DNT' : '1'
+                   }
+        return headers
+
     def GetProviderId(self):
         pass
     
@@ -69,9 +192,12 @@ class Provider(object):
     
     def ParseCommand(self, mycgi):
         pass
-    
+
+    def GetRootContextMenuItems(self):
+        return None
+
     def GetAction(self, title):
-        actionSetting = self.addon.getSetting( u'select_action' ).decode('latin1')
+        actionSetting = self.addon.getSetting( u'select_action' ).decode('utf8')
         self.log (u"action: " + actionSetting, xbmc.LOGDEBUG)
     
         # Ask
@@ -89,32 +215,57 @@ class Provider(object):
         return action
     
     #==============================================================================
+    def AddSocksToRTMP(self, rtmpVar):
+        stream_method = int(self.addon.getSetting(self.GetProviderId() + u'_proxy_method')) 
+        if stream_method == METHOD_PROXY_STREAMS:
+            proxyConfig = self.GetProxyConfig()
+            rtmpVar.setProxyString(proxyConfig.toString())
+        
+    def PlayOrDownloadEpisode(self, infoLabels, thumbnail, rtmpVar, defaultFilename):
+        try:
+            action = self.GetAction(infoLabels['Title'])
     
+            if ( action == 1 ):
+                # Play
+                self.Play(infoLabels, thumbnail, rtmpVar)
+        
+            else:
+                if ( action == 0 ):
+                    # Download
+                    self.Download(rtmpVar, defaultFilename)
+    
+            return True
+        except (Exception) as exception:
+            if not isinstance(exception, LoggingException):
+                exception = LoggingException.fromException(exception)
+    
+            # Error playing or downloading episode %s
+            exception.process(self.language(40120), u'', self.logLevel(xbmc.LOGERROR))
+            return False
+    
+    def Play(self, infoLabels, thumbnail, rtmpVar):
+        if infoLabels is None:
+            self.log (u'Play titleId: Unknown Title')
+            listItem = xbmcgui.ListItem(u'Unknown Title')
+        else:
+            self.log (u'Play titleId: ' + infoLabels[u'Title'])
+            listItem = xbmcgui.ListItem(infoLabels[u'Title'])
+            listItem.setInfo(u'video', infoLabels)
+        
+        if thumbnail is not None:
+            listItem.setThumbnailImage(thumbnail)
+    
+        play=xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+        play.clear()
+        play.add(rtmpVar.getPlayUrl(), listItem)
+    
+        xbmc.Player(xbmc.PLAYER_CORE_AUTO).play(play)
+    
+
     def Download(self, rtmpVar, defaultFilename):
         (rtmpdumpPath, downloadFolder, filename) = self.GetDownloadSettings(defaultFilename)
     
         savePath = os.path.join( downloadFolder, filename )
-
-    #        subtitles = __addon__.getSetting( 'subtitles' )
-    #        if (subtitles == 'true'):
-    #               log ("Getting subtitles")
-                # Replace '.flv' or other 3 character extension with '.smi'
-    #                SetSubtitles(episodeId, savePath[0:-4] + '.smi')
-##        params = rtmpVar.getSimpleParameters()
-##        log (u"Starting download: " + filename + " " + unicode(params))
-##        log (u"Download would be: " + os.path.join(params["download_path"], filename.encode('ascii', 'ignore')))
-##        __downloader__.download(filename.encode('ascii', 'ignore'), params)
-##        __downloader__.download("x", params)
-##        log (u"Downloader started")
-#        import time 
-#        time.sleep(time.sleep(60))
-##        log (u"Downloader started - returning")
-##        return
-#        try:
-#        except (LoggingException) as exception:
-#            
-#        try:
-
         rtmpVar.setDownloadDetails(rtmpdumpPath, savePath)
         parameters = rtmpVar.getParameters()
     
@@ -201,7 +352,6 @@ class Provider(object):
         if ( downloadFolder == u'' ):
             return
         
-        #return (downloadFolder, filename)
         return (rtmpdumpPath, downloadFolder, filename)
 
     def logLevel(self, requestLevel):
@@ -217,8 +367,12 @@ class Provider(object):
         return False
     
     #==============================================================================
+    # thumbnail must be unicode, not str
     def GetThumbnailPath(self, thumbnail):
-        path = os.path.join(sys.modules[u"__main__"].MEDIA_PATH, self.GetProviderId() + '_' + utils.replace_non_alphanum(thumbnail) + '.jpg')
+        thumbnail = unicodedata.normalize('NFKD', thumbnail).encode('ASCII', 'ignore')
+        thumbnail = utils.replace_non_alphanum(thumbnail)
+        self.log("thumbnail: " + thumbnail, xbmc.LOGDEBUG)
+        path = os.path.join(sys.modules[u"__main__"].MEDIA_PATH, self.GetProviderId() + '_' + thumbnail + '.jpg')
         
         if not os.path.exists(path):
             path = os.path.join(sys.modules[u"__main__"].MEDIA_PATH, self.GetProviderId() + '.jpg') 
@@ -264,6 +418,7 @@ class Provider(object):
         self.log(u"url '%s', pattern '%s'" % (url, pattern), xbmc.LOGDEBUG)
     
         try:
+            data = None
             data = self.httpManager.GetWebPage(url, maxAge)
     
             self.log(u"len(data): " + str(len(data)), xbmc.LOGDEBUG)
@@ -274,8 +429,20 @@ class Provider(object):
             if not isinstance(exception, LoggingException):
                 exception = LoggingException.fromException(exception)
     
+            if data is not None:
+                msg = "url: %s\n\n%s\n\n" % (url, data)
+                exception.addLogMessage(msg)
+                
             # Error getting web page %s
             exception.addLogMessage(self.language(40050) % url)
             raise exception
     
-    
+    def PlayVideoWithDialog(self, method, parameters):
+        try:
+            dialog = xbmcgui.DialogProgress()
+            dialog.create(self.GetProviderId(), self.language(40640))
+            
+            return method(*parameters)
+        finally:
+            dialog.close()
+

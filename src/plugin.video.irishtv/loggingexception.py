@@ -4,6 +4,7 @@ import xbmc
 import xbmcgui
 import sys
 import inspect
+import unicodedata
 
 from xbmc import log
 
@@ -77,7 +78,7 @@ class LoggingException (Exception):
             dialog.ok(messageHeading, messageDetail, 'See log for details')
         elif severity == xbmc.LOGWARNING:
             # See log for details
-            xbmc.executebuiltin('XBMC.Notification(IrishTV %s, %s)' % (messageHeading, 'See log for details'))
+            xbmc.executebuiltin('XBMC.Notification(IrishTV %s, %s)' % (unicodedata.normalize('NFKD', messageHeading).encode('ASCII', 'ignore'), 'See log for details'))
 
     def process(self, messageHeading = '', messageDetail = '', severity = xbmc.LOGDEBUG):
         if messageHeading == '':

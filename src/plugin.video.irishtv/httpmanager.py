@@ -2,80 +2,21 @@
 import os
 import time
 import sys
-
-import xbmc
+import codecs
 
 import urllib, urllib2
 import httplib
 import socket
 import gzip
 import StringIO
-import socks
 import random
 import glob
 import re
 
-METHOD_PROXY = 1
-METHOD_IP_FORWARD = 2
+import xbmc
+import utils
 
-# Windows 8, Internet Explorer 10
-USER_AGENT = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; Trident/6.0)"
-
-def GetProxy(addon):
-    proxy_server = None
-    proxy_type_id = 0
-    proxy_port = 8080
-    proxy_user = None
-    proxy_pass = None
-    try:
-        proxy_server = addon.getSetting(u'proxy_server')
-        proxy_type_id = addon.getSetting(u'proxy_type')
-        proxy_port = int(addon.getSetting(u'proxy_port'))
-        proxy_user = addon.getSetting(u'proxy_user')
-        proxy_pass = addon.getSetting(u'proxy_pass')
-    except ( Exception ) as exception:
-        raise exception
-
-    if   proxy_type_id == u'0': proxy_type = socks.PROXY_TYPE_HTTP_NO_TUNNEL
-    elif proxy_type_id == u'1': proxy_type = socks.PROXY_TYPE_HTTP
-    elif proxy_type_id == u'2': proxy_type = socks.PROXY_TYPE_SOCKS4
-    elif proxy_type_id == u'3': proxy_type = socks.PROXY_TYPE_SOCKS5
-
-    proxy_dns = True
-
-    if proxy_user == u'':
-        proxy_user = None
-
-    if proxy_pass == u'':
-        proxy_pass = None
-
-    return (proxy_type, proxy_server, proxy_port, proxy_dns, proxy_user, proxy_pass)
-
-
-#==============================================================================
-
-def SetupProxy():
-    addon = sys.modules["__main__"].addon
-    log = sys.modules["__main__"].log
-    
-    log("addon.getSetting(u'proxy_method') " + addon.getSetting(u'proxy_method'))
-    
-    if int(addon.getSetting(u'proxy_method')) == METHOD_PROXY:
-        try:
-            (proxy_type, proxy_server, proxy_port, proxy_dns, proxy_user, proxy_pass) = GetProxy(addon)
-    
-            log(u"Using proxy: type %i rdns: %i server: %s port: %s user: %s pass: %s" % (proxy_type, proxy_dns, proxy_server, proxy_port, u"***", u"***") )
-    
-            socks.setdefaultproxy(proxy_type, proxy_server, proxy_port, proxy_dns, proxy_user, proxy_pass)
-            socks.wrapmodule(urllib2)
-            socks.wrapmodule(httplib)
-        except ( Exception ) as exception:
-            log(u"Error processing up proxy settings", xbmc.LOGERROR)
-            log(u"Exception: " + exception.me, xbmc.LOGERROR)
-            
-            
-
-
+#TODO Separate HTTP and Cache classes. Separate subclasses for Post Binary and regular
 #==============================================================================
 class HttpManager:
 
@@ -85,12 +26,40 @@ class HttpManager:
         self.cacheDir = u""
         self.cacheSize = 20
         self.lastCode = -1
-
+        self.forwardedForIP = None
+        self.DisableForwardedForIP()
+        self.proxyConfig = None
+        
+        self.defaultHeaders = {}
+        
         if hasattr(sys.modules["__main__"], "log"):
             self.log = sys.modules["__main__"].log
         else:
             from utils import log
             self.log = log
+
+        
+    def EnableForwardedForIP(self):
+        self.isForwardedForIP = True
+
+    def DisableForwardedForIP(self):
+        self.isForwardedForIP = False
+
+    def GetIsForwardedForIP(self):
+        return self.isForwardedForIP
+
+    def GetForwardedForIP(self):
+        return self.forwardedForIP
+
+
+    def SetForwardedForIP(self, ip):
+        self.forwardedForIP = ip
+
+    def SetDefaultHeaders(self, headers):
+        self.defaultHeaders = headers
+
+    def SetProxyConfig(self, proxyConfig):
+        self.proxyConfig = proxyConfig
 
     """
     Use the given maxAge on cache attempt. If this attempt fails then try again with maxAge = 0 (don't retrieve from cache)
@@ -131,44 +100,52 @@ class HttpManager:
 
     def PostBinary(self, site, path, data, headers = None):
         self.log(u"(%s)" % (site + path), xbmc.LOGDEBUG)
-
-        SetupProxy()
-        repeat = True
-        firstTime = True
-        addon = sys.modules["__main__"].addon
-
-        while repeat:
-            repeat = False
-            try:
-                if site.startswith("http://"):
-                    site = site[7:]
+        
+        try:
+            if self.proxyConfig is not None: 
+                self.proxyConfig.Enable()
                 
-                headers = self.PrepareHeaders(addon, headers)
-
-                self.log("headers: " + repr(headers))
-                
-                conn = httplib.HTTPConnection(site)
-                conn.request("POST", path, data, headers)
-                response = conn.getresponse()
-            except ( httplib.HTTPException ) as exception:
-                self.log ( u'HTTPError: ' + unicode(exception), xbmc.LOGERROR)
-                raise exception
-            except ( socket.timeout ) as exception:
-                self.log ( u'Timeout exception: ' + unicode(exception), xbmc.LOGERROR )
-                if firstTime:
-                    self.log ( u'Timeout exception: ' + unicode(exception), xbmc.LOGERROR )
-                    xbmc.executebuiltin(u'XBMC.Notification(%s, %s)' % (u'Socket timed out', 'Trying again'))
-                    repeat = True
-                else:
-                    """
-                    The while loop is normally only processed once.
-                    When a socket timeout happens it executes twice.
-                    The following code executes after the second timeout.
-                    """
-                    self.log ( u'Timeout exception: ' + unicode(exception) + ", if you see this msg often consider changing your Socket Timeout settings", xbmc.LOGERROR )
-                    raise exception
+            repeat = True
+            firstTime = True
+            addon = sys.modules["__main__"].addon
     
-                firstTime = False
+            while repeat:
+                repeat = False
+                try:
+                    if site.startswith("http://"):
+                        site = site[7:]
+                    
+                    headers = self.PrepareHeaders(addon, headers)
+    
+                    self.log("headers: " + repr(headers))
+                    
+                    conn = httplib.HTTPConnection(site)
+                    conn.request("POST", path, data, headers)
+                    response = conn.getresponse()
+                except ( httplib.HTTPException ) as exception:
+                    self.log ( u'HTTPError: ' + unicode(exception), xbmc.LOGERROR)
+                    raise exception
+                except ( socket.timeout ) as exception:
+                    self.log ( u'Timeout exception: ' + unicode(exception), xbmc.LOGERROR )
+                    if firstTime:
+                        self.log ( u'Timeout exception: ' + unicode(exception), xbmc.LOGERROR )
+                        xbmc.executebuiltin(u'XBMC.Notification(%s, %s)' % (u'Socket timed out', 'Trying again'))
+                        repeat = True
+                    else:
+                        """
+                        The while loop is normally only processed once.
+                        When a socket timeout happens it executes twice.
+                        The following code executes after the second timeout.
+                        """
+                        self.log ( u'Timeout exception: ' + unicode(exception) + ", if you see this msg often consider changing your Socket Timeout settings", xbmc.LOGERROR )
+                        raise exception
+        
+                    firstTime = False
+        except ( Exception ) as exception:
+            raise exception
+        finally:
+            if self.proxyConfig is not None: 
+                self.proxyConfig.Disable()
     
         self.log (u"response.status: " + unicode(response.status), xbmc.LOGDEBUG)
         
@@ -179,6 +156,70 @@ class HttpManager:
         
         return response.read()
 
+    def GetHttpLibResponse(self, site, path, headers = None):
+        self.log(u"(%s)" % (site + path), xbmc.LOGDEBUG)
+
+        try:
+            if self.proxyConfig is not None: 
+                self.proxyConfig.Enable()
+            repeat = True
+            firstTime = True
+            addon = sys.modules["__main__"].addon
+    
+            while repeat:
+                repeat = False
+                try:
+                    if site.startswith("http://"):
+                        site = site[7:]
+                    
+                    headers = self.PrepareHeaders(addon, headers)
+    
+                    self.log("headers: " + repr(headers))
+                    
+                    conn = httplib.HTTPConnection(site)
+                    conn.request("GET", path, headers = headers)
+                    #conn.putheader('Connection','Keep-Alive')
+                    response = conn.getresponse()
+                except ( httplib.HTTPException ) as exception:
+                    self.log ( u'HTTPError: ' + unicode(exception), xbmc.LOGERROR)
+                    raise exception
+                except ( socket.timeout ) as exception:
+                    self.log ( u'Timeout exception: ' + unicode(exception), xbmc.LOGERROR )
+                    if firstTime:
+                        self.log ( u'Timeout exception: ' + unicode(exception), xbmc.LOGERROR )
+                        xbmc.executebuiltin(u'XBMC.Notification(%s, %s)' % (u'Socket timed out', 'Trying again'))
+                        repeat = True
+                    else:
+                        """
+                        The while loop is normally only processed once.
+                        When a socket timeout happens it executes twice.
+                        The following code executes after the second timeout.
+                        """
+                        self.log ( u'Timeout exception: ' + unicode(exception) + ", if you see this msg often consider changing your Socket Timeout settings", xbmc.LOGERROR )
+                        raise exception
+        
+                    firstTime = False
+        except ( Exception ) as exception:
+            raise exception
+        finally:
+            if self.proxyConfig is not None: 
+                self.proxyConfig.Disable()
+
+        self.log (u"response.status: " + unicode(response.status), xbmc.LOGDEBUG)
+        
+        return response
+
+    def GetViaHttpLib(self,  url, path, headers):
+        response = self.GetHttpLibResponse(url, path, headers)
+
+        if response.getheader(u'content-encoding', u'') == u'gzip':
+            self.log (u"gzipped page", xbmc.LOGDEBUG)
+            gzipper = gzip.GzipFile(fileobj=StringIO.StringIO(response.read()))
+            return gzipper.read()
+        
+        return response.read()
+        
+    
     """
     Get url from cache iff 'getFromCache' is True, otherwise get directly from web (maxAge = 0)
     If the page was not in the cache then set cacheAttempt to False, indicating that the page was
@@ -221,69 +262,129 @@ class HttpManager:
         return True
     
     #==============================================================================
+    def GetCharset(self, response):
+        if u'content-type' in response.info():
+            contentType = response.info()[u'content-type']
+            self.log (u"content-type: " + contentType, xbmc.LOGDEBUG)
+
+            typeItems = contentType.split('; ')
+            pattern = "charset=(.+)"
+            for item in typeItems:
+                try:
+                    match = re.search(pattern, item, re.DOTALL | re.IGNORECASE)
+                    return match.group(1)
+                except:
+                    pass
+        
+        return None
+                
+    
+    #==============================================================================
+    def GetMaxAge(self, response):
+        if u'cache-control' in response.info():
+            cacheControl = response.info()[u'cache-control']
+            self.log (u"cache-control: " + cacheControl, xbmc.LOGDEBUG)
+            
+            cacheItems = cacheControl.split(', ')
+            maxAgeLen = len('max-age=')
+            for item in cacheItems:
+                if item.startswith('max-age='):
+                    return int(item[maxAgeLen:])
+                
+                if item.startswith('no-cache') or item.startswith('no-store'):
+                    return 0 
+        
+        return None
+                
     
     def _GetURL_NoCache(self,  url, values, headers):
+        url = url.replace("+", "%20")
         response = self.GetHTTPResponse(url, values, headers)
 
+        charset = self.GetCharset(response)
+        maxAge = self.GetMaxAge(response)
+        
         if u'content-encoding' in response.info() and response.info()[u'content-encoding'] == u'gzip':
             self.log (u"gzipped page", xbmc.LOGDEBUG)
             gzipper = gzip.GzipFile(fileobj=StringIO.StringIO(response.read()))
-            return gzipper.read()
+            data =  gzipper.read()
+        else:
+            data = response.read()
+        #self.log(repr(response), xbmc.LOGDEBUG)
+        #self.log(utils.drepr(response), xbmc.LOGDEBUG)
         
-        return response.read()
+        if charset is None:
+            try:
+                data.decode('utf-8')
+                charset = 'utf-8'
+            except:
+                charset = 'latin1'
+            
+        self.log (u"charset, maxAge: " + unicode((charset, maxAge)), xbmc.LOGDEBUG)
+        
+        return data.decode(charset), maxAge
         
     
     def GetHTTPResponse(self,  url, values = None, headers = None):
         global lastCode
     
         self.log (u"url: " + url, xbmc.LOGDEBUG)    
+
+        try:    
+            if self.proxyConfig is not None: 
+                self.proxyConfig.Enable()
+
+            repeat = True
+            firstTime = True
+            addon = sys.modules["__main__"].addon
     
-        SetupProxy()
-        repeat = True
-        firstTime = True
-        addon = sys.modules["__main__"].addon
-
-        while repeat:
-            repeat = False
-            try:
-                # Test socket.timeout
-                #raise socket.timeout
-                postData = None
-                if values is not None:
-                    postData = urllib.urlencode(values)
-                
-                headers = self.PrepareHeaders(addon, headers)
-                
-                self.log("headers: " + repr(headers), xbmc.LOGDEBUG)
-                
-                request = urllib2.Request(url, postData, headers)
-                response = urllib2.urlopen(request)
-
-            except ( urllib2.HTTPError ) as err:
-                self.log ( u'HTTPError: ' + unicode(err), xbmc.LOGERROR)
-                lastCode = err.code
-                self.log (u"lastCode: " + unicode(lastCode), xbmc.LOGDEBUG)
-                raise err
-            except ( urllib2.URLError ) as err:
-                self.log ( u'URLError: ' + unicode(err), xbmc.LOGERROR )
-                lastCode = -1
-                raise err
-            except ( socket.timeout ) as exception:
-                self.log ( u'Timeout exception: ' + unicode(exception), xbmc.LOGERROR )
-                if firstTime:
+            while repeat:
+                repeat = False
+                try:
+                    # Test socket.timeout
+                    #raise socket.timeout
+                    postData = None
+                    if values is not None:
+                        postData = urllib.urlencode(values)
+                        self.log("postData: " + repr(postData))
+                    
+                    headers = self.PrepareHeaders(addon, headers)
+                    
+                    self.log("headers: " + repr(headers), xbmc.LOGDEBUG)
+                    
+                    request = urllib2.Request(url, postData, headers)
+                    response = urllib2.urlopen(request)
+    
+                except ( urllib2.HTTPError ) as err:
+                    self.log ( u'HTTPError: ' + unicode(err), xbmc.LOGERROR)
+                    lastCode = err.code
+                    self.log (u"lastCode: " + unicode(lastCode), xbmc.LOGDEBUG)
+                    raise err
+                except ( urllib2.URLError ) as err:
+                    self.log ( u'URLError: ' + unicode(err), xbmc.LOGERROR )
+                    lastCode = -1
+                    raise err
+                except ( socket.timeout ) as exception:
                     self.log ( u'Timeout exception: ' + unicode(exception), xbmc.LOGERROR )
-                    xbmc.executebuiltin(u'XBMC.Notification(%s, %s)' % (u'Socket timed out', 'Trying again'))
-                    repeat = True
-                else:
-                    """
-                    The while loop is normally only processed once.
-                    When a socket timeout happens it executes twice.
-                    The following code executes after the second timeout.
-                    """
-                    self.log ( u'Timeout exception: ' + unicode(exception) + ", if you see this msg often consider changing your Socket Timeout settings", xbmc.LOGERROR )
-                    raise exception
-    
-                firstTime = False
+                    if firstTime:
+                        self.log ( u'Timeout exception: ' + unicode(exception), xbmc.LOGERROR )
+                        xbmc.executebuiltin(u'XBMC.Notification(%s, %s)' % (u'Socket timed out', 'Trying again'))
+                        repeat = True
+                    else:
+                        """
+                        The while loop is normally only processed once.
+                        When a socket timeout happens it executes twice.
+                        The following code executes after the second timeout.
+                        """
+                        self.log ( u'Timeout exception: ' + unicode(exception) + ", if you see this msg often consider changing your Socket Timeout settings", xbmc.LOGERROR )
+                        raise exception
+        
+                    firstTime = False
+        except ( Exception ) as exception:
+            raise exception
+        finally:
+            if self.proxyConfig is not None: 
+                self.proxyConfig.Disable()
     
         lastCode = response.getcode()
         self.log (u"lastCode: " + unicode(lastCode), xbmc.LOGDEBUG)
@@ -292,20 +393,16 @@ class HttpManager:
         
     #==============================================================================
     
-    def PrepareHeaders(self, addon, headers):
-        if headers is None:
-            headers = {}
-        
-        if 'User-Agent' not in headers:
-            headers['User-Agent'] = USER_AGENT
-            
-        if int(addon.getSetting(u'proxy_method')) == METHOD_IP_FORWARD:
-            ipSegment1 = int(float(addon.getSetting(u'forward_segment1')))
-            ipSegment2 = int(float(addon.getSetting(u'forward_segment2')))
-            
-            forwardedForIP = '%d.%d.%d.%d' % (ipSegment1, ipSegment2, random.randint(0, 255), random.randint(0, 254)) 
-            headers['X-Forwarded-For'] = forwardedForIP
-            self.log("Using header 'X-Forwarded-For': " + forwardedForIP)
+    def PrepareHeaders(self, addon, newHeaders):
+        headers = {}
+        headers.update(self.defaultHeaders)
+
+        if newHeaders is not None:
+            headers.update(newHeaders)
+
+        if self.isForwardedForIP is True:
+            headers['X-Forwarded-For'] = self.forwardedForIP
+            self.log("Using header 'X-Forwarded-For': " + self.forwardedForIP)
             
         return headers
             
@@ -323,11 +420,12 @@ class HttpManager:
     def GetURL(self,  url, maxAgeSeconds=0, values = None, headers = None):
         global lastCode
     
-        self.log (u"GetURL: " + url, xbmc.LOGDEBUG)
+        self.log (url, xbmc.LOGDEBUG)
         # If no cache dir has been specified then return the data without caching
         if self._CheckCacheDir() == False:
             self.log (u"Not caching HTTP", xbmc.LOGDEBUG)
-            return self._GetURL_NoCache( url, values, headers)
+            data, responseMaxAge = self._GetURL_NoCache( url, values, headers)
+            return data
     
         currentTime = int(round(time.time()))
         
@@ -341,10 +439,14 @@ class HttpManager:
                 if currentTime > int(expiryString):
                     self.log (u"Cached version is too old", xbmc.LOGDEBUG)
                     # Too old, so need to get it again
-                    data = self._GetURL_NoCache( url, values, headers)
+                    data, responseMaxAge = self._GetURL_NoCache( url, values, headers)
     
-                    # Cache it
-                    self.CachePage(url, data, values, currentTime + maxAgeSeconds)
+                    if responseMaxAge is not None:
+                        maxAgeSeconds = responseMaxAge
+                        
+                    if maxAgeSeconds <> 0:
+                        # Cache it
+                        self.CachePage(url, data, values, currentTime + maxAgeSeconds)
     
                     # Cache size maintenance
                     self._Cache_Trim(currentTime)
@@ -362,8 +464,11 @@ class HttpManager:
                         self.log(u"Error retrieving page from cache. Zero length page. Retrieving from web.")
         
         # maxAge = 0 or URL not in cache, so get it
-        data = self._GetURL_NoCache( url, values, headers)
+        data, responseMaxAge = self._GetURL_NoCache( url, values, headers)
 
+        if responseMaxAge is not None:
+            maxAgeSeconds = responseMaxAge
+            
         if maxAgeSeconds > 0:
             self.CachePage(url, data, values, currentTime + maxAgeSeconds)
     
@@ -398,7 +503,7 @@ class HttpManager:
         filename = cacheKey + "_" + expiryString
         cacheFileFullPath = os.path.join( self.cacheDir, filename )
         self.log (u"Cache file: %s" % cacheFileFullPath, xbmc.LOGDEBUG)
-        f = file(cacheFileFullPath, u"r")
+        f = codecs.open(cacheFileFullPath, u"r", u'utf-8')
         data = f.read()
         f.close()
     
@@ -415,7 +520,7 @@ class HttpManager:
         filename = cacheKey + "_" + str(currentTime)
         cacheFileFullPath = os.path.join( self.cacheDir, filename )
         self.log (u"Cache file: %s" % cacheFileFullPath, xbmc.LOGDEBUG)
-        f = file(cacheFileFullPath, u"w")
+        f = codecs.open(cacheFileFullPath, u"w", u'utf-8')
         f.write(data)
         f.close()
     
@@ -424,10 +529,9 @@ class HttpManager:
     def _Cache_CreateKey(self,  url, values ):
         try:
             if values is not None:
-                url = url + u'_'
-                for value in values:
-                    url = url + value + '=' + unicode(values[value])
+                url = url + "?" + urllib.urlencode(values)
             
+            #    url = unicodedata.normalize('NFKD', url).encode('ASCII', 'ignore')
             self.log("url: " + url)
             from hashlib import md5
             return md5(url).hexdigest()
@@ -458,6 +562,14 @@ class HttpManager:
         
     #==============================================================================
         
+    def ClearCache(self):
+        files = glob.iglob( self.cacheDir + "/*" )
+        for fileFullPath in files:
+            self.log("Deleting cache fileFullPath: " + fileFullPath, xbmc.LOGDEBUG)
+            if os.path.exists(fileFullPath):
+                os.remove(fileFullPath)
+        
+
     def _Cache_Trim(self, currentTime):
         epochLen = 10
         cacheKeyLen = 32
