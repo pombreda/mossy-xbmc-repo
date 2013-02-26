@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="repository.mossy" name="Mossys Add-ons" version="1.0.7" provider-name="mossy">
-    <extension point="xbmc.addon.repository" name="Mossys Add-ons">
+<addon id="repository.test" name="Test repo" version="1.0.0" provider-name="mossy">
+    <extension point="xbmc.addon.repository" name="Test repo">
         <info compressed="false">http://mossy-xbmc-repo.googlecode.com/git/test/addons.xml</info>
         <checksum>http://mossy-xbmc-repo.googlecode.com/git/test/addons.xml.md5</checksum>
         <datadir zip="true">http://mossy-xbmc-repo.googlecode.com/git/test</datadir>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary>Install add-ons from Mossys add-on repository</summary>
-        <description>Home of Irish TV Player &amp; 4oD</description>
+        <description>Test</description>
         <platform>all</platform>
     </extension>
 </addon>

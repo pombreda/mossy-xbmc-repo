@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.irishtv2"
-       name="Irish TV"
-       version="1.0.3"
+<addon id="plugin.video.test"
+       name="test"
+       version="1.0.0"
        provider-name="mossy">
     <requires>
         <import addon="xbmc.python" version="2.0"/>
-        <import addon="script.module.pyamf" version="0.6.1"/>
-    	<import addon="script.module.beautifulsoup" version="3.2.0"/>
     </requires>
     <extension point="xbmc.python.pluginsource"
                library="default.py">
@@ -15,8 +13,7 @@
     <extension point="xbmc.addon.metadata">
 	<language>en</language>
         <platform>all</platform>
-        <summary>Irish TV On Demand</summary>
-        <description>Irish TV On Demand. RTE, including live TV, TV3 and AerTV</description>
-	<disclaimer>May not work outside Ireland</disclaimer>
+        <summary>Test</summary>
+        <description>Test</description>
     </extension>
 </addon>
