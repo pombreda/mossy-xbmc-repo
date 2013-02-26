@@ -506,9 +506,9 @@ class RTEProvider(Provider):
             folder = True
         else:
             folder = False
-            match = re.search( u"/player/ie/show/([0-9]+)/", href )
+            match = re.search( u"/player/[^/]+/show/([0-9]+)/", href )
             if match is None:
-                self.log(u"No show id found in page href: '%s'" % page, xbmc.LOGWARNING)
+                self.log(u"No show id found in page href: '%s'" % href, xbmc.LOGWARNING)
                 return
         
             episodeId = match.group(1)
@@ -593,9 +593,9 @@ class RTEProvider(Provider):
         newListItem.setInfo(u'video', infoLabels)
         newListItem.setThumbnailImage(thumbnail)
 
-        match = re.search( u"/player/ie/show/([0-9]+)/", href )
+        match = re.search( u"/player/[^/]+/show/([0-9]+)/", href )
         if match is None:
-            self.log(u"No show id found in page href: '%s'" % page, xbmc.LOGWARNING)
+            self.log(u"No show id found in page href: '%s'" % href, xbmc.LOGWARNING)
             return
     
         episodeId = match.group(1)
@@ -656,7 +656,7 @@ class RTEProvider(Provider):
     def ListAvailable(self, html):
         self.log(u"", xbmc.LOGDEBUG)
         listItems = []
-    
+        
         try:        
             soup = BeautifulSoup(html, selfClosingTags=[u'img'])
             count = int(soup.find(u'meta', { u'name' : u"episodes_available"} )[u'content'])
