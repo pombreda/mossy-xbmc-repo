@@ -1,5 +1,11 @@
-Version 1.0.5
-= Bug fix: Forgot to change socksipy version in addon.xml
+Version 1.0.8
+- Improve progress dialog
+
+Version 1.0.7
+- Moved repository
+
+Version 1.0.6
+- Fix for people who get unusual URLs from RTE, e.g. "/player/6c..." instead of "/player/ie..."
 
 Version 1.0.4
 - Bug fix: Not starting for anyone who doesn't have mercurial.wireproto package
