@@ -5,7 +5,7 @@
        provider-name="Mossy">
   <requires>
     <import addon="xbmc.python" 
-    		version="1.0.0"/>
+    		version="2.1.0"/>
   </requires>
   <extension point="xbmc.python.module"
              library="lib" />
