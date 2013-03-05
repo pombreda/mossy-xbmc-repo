@@ -20,7 +20,7 @@
 
 <addon id="plugin.video.4od"
        name="4oD"
-       version="2.0.5"
+       version="2.0.6"
        provider-name="mossy">
     <requires>
         <import addon="script.module.socksipy" version="1.0.0"/>
