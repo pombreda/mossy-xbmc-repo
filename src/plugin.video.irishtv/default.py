@@ -8,18 +8,18 @@ REMOTE_DBG = False
 
 # append pydev remote debugger
 if REMOTE_DBG:
-	# Make pydev debugger works for auto reload.
-	# Note pydevd module need to be copied in XBMC\system\python\Lib\pysrc
-	try:
-		import pysrc.pydevd as pydevd
-	# stdoutToServer and stderrToServer redirect stdout and stderr to eclipse console
-		pydevd.settrace('localhost', stdoutToServer=True, stderrToServer=True)
-		#pydevd.settrace('localhost', port=5678, stdoutToServer=True, stderrToServer=True)
-		
-	except ImportError:
-		sys.stderr.write("Error: " +
-			"You must add org.python.pydev.debug.pysrc to your PYTHONPATH.")
-		sys.exit(1)
+    # Make pydev debugger works for auto reload.
+    # Note pydevd module need to be copied in XBMC\system\python\Lib\pysrc
+    try:
+        import pysrc.pydevd as pydevd
+    # stdoutToServer and stderrToServer redirect stdout and stderr to eclipse console
+        pydevd.settrace('localhost', stdoutToServer=True, stderrToServer=True)
+        #pydevd.settrace('localhost', port=5678, stdoutToServer=True, stderrToServer=True)
+        
+    except ImportError:
+        sys.stderr.write("Error: " +
+            "You must add org.python.pydev.debug.pysrc to your PYTHONPATH.")
+        sys.exit(1)
 
 
 import os
@@ -64,183 +64,260 @@ httpManager = HttpManager()
 
 
 # Use masterprofile rather profile, because we are caching data that may be used by more than one user on the machine
-DATA_FOLDER	  = xbmc.translatePath( os.path.join( u"special://masterprofile", u"addon_data", pluginName ) )
-CACHE_FOLDER	 = os.path.join( DATA_FOLDER, u'cache' )
+DATA_FOLDER      = xbmc.translatePath( os.path.join( u"special://masterprofile", u"addon_data", pluginName ) )
+CACHE_FOLDER     = os.path.join( DATA_FOLDER, u'cache' )
 RESOURCE_PATH = os.path.join( sys.modules[u"__main__"].addon.getAddonInfo( u"path" ), u"resources" )
 MEDIA_PATH = os.path.join( RESOURCE_PATH, u"media" )
 
-#SUBTITLE_FILE	= os.path.join( DATA_FOLDER, 'subtitle.smi' )
+#SUBTITLE_FILE    = os.path.join( DATA_FOLDER, 'subtitle.smi' )
 #NO_SUBTITLE_FILE = os.path.join( RESOURCE_PATH, 'nosubtitles.smi' )
 
 def get_system_platform():
-	platform = u"unknown"
-	if xbmc.getCondVisibility( u"system.platform.linux" ):
-		platform = u"linux"
-	elif xbmc.getCondVisibility( u"system.platform.xbox" ):
-		platform = u"xbox"
-	elif xbmc.getCondVisibility( u"system.platform.windows" ):
-		platform = u"windows"
-	elif xbmc.getCondVisibility( u"system.platform.osx" ):
-		platform = u"osx"
+    platform = u"unknown"
+    if xbmc.getCondVisibility( u"system.platform.linux" ):
+        platform = u"linux"
+    elif xbmc.getCondVisibility( u"system.platform.xbox" ):
+        platform = u"xbox"
+    elif xbmc.getCondVisibility( u"system.platform.windows" ):
+        platform = u"windows"
+    elif xbmc.getCondVisibility( u"system.platform.osx" ):
+        platform = u"osx"
 
-	log(u"Platform: %s" % platform, xbmc.LOGDEBUG)
-	return platform
+    log(u"Platform: %s" % platform, xbmc.LOGDEBUG)
+    return platform
 
-__platform__	 = get_system_platform()
+__platform__     = get_system_platform()
 
 
 def ShowProviders():
-	listItems = []
-	contextMenuItems = []
-	contextMenuItems.append(('Clear HTTP Cache', "XBMC.RunPlugin(%s?clearcache=1)" % sys.argv[0] ))
-	contextMenuItems.append(('Test Forwarded IP', "XBMC.RunPlugin(%s?testforwardedip=1)" % sys.argv[0] ))
-	
-	providers = providerfactory.getProviderList()
+    listItems = []
+    contextMenuItems = []
+    contextMenuItems.append(('Clear HTTP Cache', "XBMC.RunPlugin(%s?clearcache=1)" % sys.argv[0] ))
+    contextMenuItems.append(('Test Forwarded IP', "XBMC.RunPlugin(%s?testforwardedip=1)" % sys.argv[0] ))
+    
+    providers = providerfactory.getProviderList()
 
 
-	for provider in providers:
-		providerName = provider.GetProviderId()
-		log(u"Adding " + providerName + u" provider", xbmc.LOGDEBUG)
-		newListItem = xbmcgui.ListItem( providerName )
-		url = baseURL + u'?provider=' + providerName
+    for provider in providers:
+        providerName = provider.GetProviderId()
+        log(u"Adding " + providerName + u" provider", xbmc.LOGDEBUG)
+        newListItem = xbmcgui.ListItem( providerName )
+        url = baseURL + u'?provider=' + providerName
 
-		log(u"url: " + url, xbmc.LOGDEBUG)
-		thumbnailPath = provider.GetThumbnailPath(providerName)
-		log(providerName + u" thumbnail: " + thumbnailPath, xbmc.LOGDEBUG)
-		newListItem.setThumbnailImage(thumbnailPath)
-		newListItem.addContextMenuItems( contextMenuItems )
-		listItems.append( (url,newListItem,True) )
-	
+        log(u"url: " + url, xbmc.LOGDEBUG)
+        thumbnailPath = provider.GetThumbnailPath(providerName)
+        log(providerName + u" thumbnail: " + thumbnailPath, xbmc.LOGDEBUG)
+        newListItem.setThumbnailImage(thumbnailPath)
+        newListItem.addContextMenuItems( contextMenuItems )
+        listItems.append( (url,newListItem,True) )
+    
 
-	xbmcplugin.addDirectoryItems( handle=pluginHandle, items=listItems )
-	xbmcplugin.endOfDirectory( handle=pluginHandle, succeeded=True )
-		
+    xbmcplugin.addDirectoryItems( handle=pluginHandle, items=listItems )
+    xbmcplugin.endOfDirectory( handle=pluginHandle, succeeded=True )
+        
 
 #==============================================================================
 
 def InitTimeout():
-	log(u"getdefaulttimeout(): " + str(getdefaulttimeout()), xbmc.LOGDEBUG)
-	environment = os.environ.get( u"OS", u"xbox" )
-	if environment in [u'Linux', u'xbox']:
-		try:
-			timeout = int(addon.getSetting(u'socket_timeout'))
-			if (timeout > 0):
-				setdefaulttimeout(timeout)
-		except:
-			setdefaulttimeout(None)
+    log(u"getdefaulttimeout(): " + str(getdefaulttimeout()), xbmc.LOGDEBUG)
+    environment = os.environ.get( u"OS", u"xbox" )
+    if environment in [u'Linux', u'xbox']:
+        try:
+            timeout = int(addon.getSetting(u'socket_timeout'))
+            if (timeout > 0):
+                setdefaulttimeout(timeout)
+        except:
+            setdefaulttimeout(None)
 
 def TestForwardedIP(forwardedIP):
-	try:
-		html = None
-		log(u"TestForwardedIP: " + forwardedIP)
-		httpManager.EnableForwardedForIP()
-		httpManager.SetForwardedForIP( forwardedIP )
-		html = httpManager.GetWebPageDirect( xhausUrl )
-		
-		soup = BeautifulSoup(html)
-		xForwardedForString = soup.find(text='X-Forwarded-For')
-		
-		if xForwardedForString is None:
-			dialog = xbmcgui.Dialog()
-			dialog.ok(language(25000), language(25030))
-		else:
-			forwardedForIP = xForwardedForString.parent.findNextSibling('td').text
-			
-			dialog = xbmcgui.Dialog()
-			dialog.ok(language(25010), language(25040) + forwardedForIP)
-			
-		return True
-		
-	except (Exception) as exception:
-		if not isinstance(exception, LoggingException):
-			exception = LoggingException.fromException(exception)
+    try:
+        html = None
+        log(u"TestForwardedIP: " + forwardedIP)
+        httpManager.EnableForwardedForIP()
+        httpManager.SetForwardedForIP( forwardedIP )
+        html = httpManager.GetWebPageDirect( xhausUrl )
+        
+        soup = BeautifulSoup(html)
+        xForwardedForString = soup.find(text='X-Forwarded-For')
+        
+        if xForwardedForString is None:
+            dialog = xbmcgui.Dialog()
+            dialog.ok(language(25000), language(25030))
+        else:
+            forwardedForIP = xForwardedForString.parent.findNextSibling('td').text
+            
+            dialog = xbmcgui.Dialog()
+            dialog.ok(language(25010), language(25040) + forwardedForIP)
+            
+        return True
+        
+    except (Exception) as exception:
+        if not isinstance(exception, LoggingException):
+            exception = LoggingException.fromException(exception)
 
-		dialog = xbmcgui.Dialog()
-		dialog.ok(language(25020), language(25050))
-		
-		# Error getting web page
-		exception.addLogMessage(language(30050))
-		exception.printLogMessages(xbmc.LOGERROR)
-		return False
+        dialog = xbmcgui.Dialog()
+        dialog.ok(language(25020), language(25050))
+        
+        # Error getting web page
+        exception.addLogMessage(language(30050))
+        exception.printLogMessages(xbmc.LOGERROR)
+        return False
 
 
-	
+    
 #==============================================================================
 def executeCommand():
-	success = False
-	if ( mycgi.EmptyQS() ):
-		success = ShowProviders()
-	else:
-		(providerName, clearCache, testForwardedIP) = mycgi.Params( u'provider', u'clearcache', u'testforwardedip' )
-		
-		if clearCache != u'':
-			httpManager.ClearCache()
-			return True
-		
-		elif testForwardedIP != u'':
-			provider = Provider()
-			provider.addon = sys.modules[u"__main__"].addon
+    success = False
+    if ( mycgi.EmptyQS() ):
+        success = ShowProviders()
+    else:
+        (providerName, clearCache, testForwardedIP) = mycgi.Params( u'provider', u'clearcache', u'testforwardedip' )
+        
+        if clearCache != u'':
+            httpManager.ClearCache()
+            return True
+        
+        elif testForwardedIP != u'':
+            provider = Provider()
+            provider.addon = sys.modules[u"__main__"].addon
 
-			httpManager.SetDefaultHeaders( provider.GetHeaders() )
-			forwardedIP = provider.CreateForwardedForIP('0.0.0.0')
-			
-			return TestForwardedIP(forwardedIP)
-			
-		elif providerName != u'':
-			log(u"providerName: " + providerName, xbmc.LOGDEBUG)
-			if providerName <> u'':
-				provider = providerfactory.getProvider(providerName)
-				
-				if provider is None:
-					# ProviderFactory return none for providerName: %s
-					logException = LoggingException(language(30000) % providerName)
-					# 'Cannot proceed', Error processing provider name
-					logException.process(language(30755), language(30020), xbmc.LOGERROR)
-					return False
-				
-				provider.initialise(httpManager, sys.argv[0], pluginHandle)
-				success = provider.ExecuteCommand(mycgi)
-				log (u"executeCommand done", xbmc.LOGDEBUG)
-			
+            httpManager.SetDefaultHeaders( provider.GetHeaders() )
+            forwardedIP = provider.CreateForwardedForIP('0.0.0.0')
+            
+            return TestForwardedIP(forwardedIP)
+            
+        elif providerName != u'':
+            log(u"providerName: " + providerName, xbmc.LOGDEBUG)
+            if providerName <> u'':
+                provider = providerfactory.getProvider(providerName)
+                
+                if provider is None:
+                    # ProviderFactory return none for providerName: %s
+                    logException = LoggingException(language(30000) % providerName)
+                    # 'Cannot proceed', Error processing provider name
+                    logException.process(language(30755), language(30020), xbmc.LOGERROR)
+                    return False
+                
+                provider.initialise(httpManager, sys.argv[0], pluginHandle)
+                success = provider.ExecuteCommand(mycgi)
+                log (u"executeCommand done", xbmc.LOGDEBUG)
+            
 
-	return success
-#		if ( search <> '' ):
-#			error = DoSearch()
-#		elif ( showId <> '' and episodeId == ''):
-#			error = ShowEpisodes( showId, title )
-#		elif ( category <> '' ):
-#			error = ShowCategory( category, title, order, page )
-#		elif ( episodeId <> '' ):
-#			(episodeNumber, seriesNumber, swfPlayer) = mycgi.Params( 'episodeNumber', 'seriesNumber', 'swfPlayer' )
-#			error = PlayOrDownloadEpisode( showId, int(seriesNumber), int(episodeNumber), episodeId, title, swfPlayer )
-#	
+    return success
+#        if ( search <> '' ):
+#            error = DoSearch()
+#        elif ( showId <> '' and episodeId == ''):
+#            error = ShowEpisodes( showId, title )
+#        elif ( category <> '' ):
+#            error = ShowCategory( category, title, order, page )
+#        elif ( episodeId <> '' ):
+#            (episodeNumber, seriesNumber, swfPlayer) = mycgi.Params( 'episodeNumber', 'seriesNumber', 'swfPlayer' )
+#            error = PlayOrDownloadEpisode( showId, int(seriesNumber), int(episodeNumber), episodeId, title, swfPlayer )
+#    
+
+
+REPO_VERSION = "2.0.7"
+def isNewRepoInstalled():
+    addonPath = xbmc.translatePath(os.path.join('special://home/addons', 'repository.mossy', 'addon.xml'))
+    if not os.path.exists(addonPath):
+        return False
+    
+    file = open(addonPath)
+    xml = file.read()
+    file.close()
+    
+    soup = BeautifulStoneSoup(xml)
+    
+    version = soup.find('addon')['version']
+    
+    if version == REPO_VERSION:
+        return True
+    
+    return False
 
 
 if __name__ == "__main__":
 
-		try:
-			if addon.getSetting('http_cache_disable') == 'false':
-				httpManager.SetCacheDir( CACHE_FOLDER )
-	
-			InitTimeout()
-		
-			# Each command processes a web page
-			# Get the web page from the cache if it's there
-			# If there is an error when processing the web page from the cache
-			# we want to try again, this time getting the page from the web
-			httpManager.setGetFromCache(True)
-			success = executeCommand()			
-	
-			xbmc.log(u"success: %s, getGotFromCache(): %s" % (unicode(success), unicode(httpManager.getGotFromCache())), xbmc.LOGDEBUG)
-			
-			if success is not None and success == False and httpManager.getGotFromCache() == True:
-				httpManager.setGetFromCache(False)
-				executeCommand()
-				log (u"executeCommand after", xbmc.LOGDEBUG)
-				
-		except:
-			# Make sure the text from any script errors are logged
-			import traceback
-			traceback.print_exc(file=sys.stdout)
-			raise
+        try:
+            if not isNewRepoInstalled():
+                dialog = xbmcgui.Dialog()
+                selection = dialog.yesno("Mossy's Addons Repository has moved", "The repository that this plugin was installed", "from has moved. The new version of the", " repository will be installed.", "Cancel", "Install")
+
+                if selection == True:
+                    log("Installing new repository")
+                    #url = "http://mossy-xbmc-repo.googlecode.com/git-history/eden/test/repository.test/repository.test-1.0.3.zip"
+                    url = "http://mossy-xbmc-repo.googlecode.com/git/release/repository.mossy/repository.mossy-%s.zip" % REPO_VERSION
+                    log("url: %s" % url)
+                    path = xbmc.translatePath(os.path.join('special://home/addons','packages'))
+                    log("path: %s" % path)
+                    lib=os.path.join(path, 'repository.mossy-%s.zip' % REPO_VERSION)
+                    log("lib: %s" % lib)
+
+                    errMessageHeader = "Error downloading new repository"
+                    errMessageLine1 = "Download and install repository manually from"
+                    errMessageLine2 = "\"http://code.google.com/p/mossy-xbmc-repo/downloads/list\""
+                    try:
+                        repoZipData = httpManager.GetHTTPResponse(url).read()
+                    except (Exception) as exception:
+                        log("exception: %s" % repr(exception))
+                        try:
+                            repoZipData = httpManager.GetHTTPResponse(url).read()
+                        except (Exception) as exception:
+                            log("exception: %s" % repr(exception))
+                            try:
+                                repoZipData = httpManager.GetHTTPResponse(url).read()
+                            except (Exception) as exception:
+                                dialog.ok(errMessageHeader, errMessageLine1, errMessageLine2)
+                                raise exception
+
+                
+                    log("repoZipData")
+                    repoZipFile = open(lib, 'w')
+                    repoZipFile.write(repoZipData)
+                    repoZipFile.close()
+                
+                    log("repoZipData written to file")
+                    addonfolder = xbmc.translatePath(os.path.join('special://home/addons',''))
+                    log("addonfolder2: %s" % addonfolder)
+
+                    result = xbmc.executebuiltin("XBMC.Extract(%s, %s)" % (lib,addonfolder))
+
+                    xbmc.sleep( 1000 )
+                    for attempt in range(1,6):
+                        if not isNewRepoInstalled():
+                            xbmc.sleep( 10000 )
+
+                    dialog = xbmcgui.Dialog()
+
+                    if not isNewRepoInstalled():
+                        dialog.ok("Error installing repository", errMessageLine1, errMessageLine2)
+                    else:
+                        dialog.ok("Repository installed", "Please restart XBMC to take effect")
+
+            else:
+        
+                if addon.getSetting('http_cache_disable') == 'false':
+                httpManager.SetCacheDir( CACHE_FOLDER )
+    
+            InitTimeout()
+        
+            # Each command processes a web page
+            # Get the web page from the cache if it's there
+            # If there is an error when processing the web page from the cache
+            # we want to try again, this time getting the page from the web
+            httpManager.setGetFromCache(True)
+            success = executeCommand()            
+    
+            xbmc.log(u"success: %s, getGotFromCache(): %s" % (unicode(success), unicode(httpManager.getGotFromCache())), xbmc.LOGDEBUG)
+            
+            if success is not None and success == False and httpManager.getGotFromCache() == True:
+                httpManager.setGetFromCache(False)
+                executeCommand()
+                log (u"executeCommand after", xbmc.LOGDEBUG)
+                
+        except:
+            # Make sure the text from any script errors are logged
+            import traceback
+            traceback.print_exc(file=sys.stdout)
+            raise
 

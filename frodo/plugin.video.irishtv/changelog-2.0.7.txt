@@ -1,5 +1,8 @@
 Version 2.0.7
-- Moved repository
+- Moving repository
+
+Version 2.0.6
+- Fix for people who get unusual URLs from RTE, e.g. "/player/6c..." instead of "/player/ie..."
 
 Version 2.0.4
 - Bug fix: Not starting for anyone who doesn't have mercurial.wireproto package
