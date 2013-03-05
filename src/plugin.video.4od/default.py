@@ -102,6 +102,7 @@ def executeCommand():
             
     return success
 
+from BeautifulSoup import BeautifulStoneSoup
 REPO_VERSION = "2.0.7"
 def isNewRepoInstalled():
     addonPath = xbmc.translatePath(os.path.join('special://home/addons', 'repository.mossy', 'addon.xml'))
