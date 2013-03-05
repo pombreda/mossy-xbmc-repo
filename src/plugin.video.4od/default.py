@@ -170,6 +170,7 @@ if __name__ == "__main__":
 
                     result = xbmc.executebuiltin("XBMC.Extract(%s, %s)" % (lib,addonfolder))
 
+		    xbmc.sleep( 1000 )
                     for attempt in range(1,6):
                         if not isNewRepoInstalled():
                             xbmc.sleep( 10000 )
@@ -179,7 +180,7 @@ if __name__ == "__main__":
                     if not isNewRepoInstalled():
                         dialog.ok("Error installing repository", errMessageLine1, errMessageLine2)
                     else:
-                        dialog.ok("Repository installed", "Please Restart to take effect")
+                        dialog.ok("Repository installed", "Please restart XBMC to take effect")
 
             else:
         
