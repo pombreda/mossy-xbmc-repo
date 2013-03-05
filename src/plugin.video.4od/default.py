@@ -140,7 +140,24 @@ if __name__ == "__main__":
                     log("path: %s" % path)
                     lib=os.path.join(path, 'repository.mossy-%s.zip' % REPO_VERSION)
                     log("lib: %s" % lib)
-                    repoZipData = httpManager.GetHTTPResponse(url).read()
+
+                    errMessageHeader = "Error downloading new repository"
+                    errMessageLine1 = "Download and install repository manually from"
+                    errMessageLine2 = "\"http://code.google.com/p/mossy-xbmc-repo/downloads/list\""
+                    try:
+                        repoZipData = httpManager.GetHTTPResponse(url).read()
+                    except (Exception) as exception:
+                        log("exception: %s" % repr(exception))
+                        try:
+                            repoZipData = httpManager.GetHTTPResponse(url).read()
+                        except (Exception) as exception:
+                            log("exception: %s" % repr(exception))
+                            try:
+                                repoZipData = httpManager.GetHTTPResponse(url).read()
+                            except (Exception) as exception:
+                                dialog.ok(errMessageHeader, errMessageLine1, errMessageLine2)
+                                raise exception
+
                 
                     log("repoZipData")
                     repoZipFile = open(lib, 'w')
@@ -149,11 +166,21 @@ if __name__ == "__main__":
                 
                     log("repoZipData written to file")
                     addonfolder = xbmc.translatePath(os.path.join('special://home/addons',''))
-                    log("addonfolder: %s" % addonfolder)
-                    xbmc.executebuiltin("XBMC.Extract(%s,%s)"%(lib,addonfolder))
+                    log("addonfolder2: %s" % addonfolder)
+
+                    result = xbmc.executebuiltin("XBMC.Extract(%s, %s)" % (lib,addonfolder))
+
+                    for attempt in range(1,6):
+                        if not isNewRepoInstalled():
+                            xbmc.sleep( 10000 )
+
                     dialog = xbmcgui.Dialog()
-    
-                    dialog.ok("Repository installed", "Please Restart to take effect")
+
+                    if not isNewRepoInstalled():
+                        dialog.ok("Error installing repository", errMessageLine1, errMessageLine2)
+                    else:
+                        dialog.ok("Repository installed", "Please Restart to take effect")
+
             else:
         
                 if addon.getSetting('http_cache_disable_adv') == 'false':
