@@ -131,7 +131,7 @@ if __name__ == "__main__":
                 dialog = xbmcgui.Dialog()
                 selection = dialog.yesno("Mossy's Addons Repository has moved", "The repository that this plugin was installed", "from has moved. The new version of the", " repository will be installed.", "Cancel", "Install")
 
-                if selection is True:
+                if selection == True:
                     log("Installing new repository")
                     #url = "http://mossy-xbmc-repo.googlecode.com/git-history/eden/test/repository.test/repository.test-1.0.3.zip"
                     url = "http://mossy-xbmc-repo.googlecode.com/git/release/repository.mossy/repository.mossy-%s.zip" % REPO_VERSION
