@@ -31,6 +31,7 @@ import re
 from xbmcaddon import Addon
 from loggingexception import LoggingException
 from BeautifulSoup import BeautifulSoup
+from BeautifulSoup import BeautifulStoneSoup
 
 
 pluginName  = u'plugin.video.irishtv'
@@ -297,7 +298,7 @@ if __name__ == "__main__":
             else:
         
                 if addon.getSetting('http_cache_disable') == 'false':
-                httpManager.SetCacheDir( CACHE_FOLDER )
+                    httpManager.SetCacheDir( CACHE_FOLDER )
     
             InitTimeout()
         
