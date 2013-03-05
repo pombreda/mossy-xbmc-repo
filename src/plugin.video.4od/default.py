@@ -78,15 +78,15 @@ __platform__     = get_system_platform()
 
 
 def InitTimeout():
-	log("getdefaulttimeout(): " + str(getdefaulttimeout()), xbmc.LOGDEBUG)
-	environment = os.environ.get( "OS", "xbox" )
-	if environment in ['Linux', 'xbox']:
-		try:
-			timeout = int(addon.getSetting('socket_timeout'))
-			if (timeout > 0):
-				setdefaulttimeout(timeout)
-		except:
-			setdefaulttimeout(None)
+    log("getdefaulttimeout(): " + str(getdefaulttimeout()), xbmc.LOGDEBUG)
+    environment = os.environ.get( "OS", "xbox" )
+    if environment in ['Linux', 'xbox']:
+        try:
+            timeout = int(addon.getSetting('socket_timeout'))
+            if (timeout > 0):
+                setdefaulttimeout(timeout)
+        except:
+            setdefaulttimeout(None)
 
 
 
@@ -102,28 +102,70 @@ def executeCommand():
             
     return success
 
+REPO_VERSION = "2.0.7"
+def isNewRepoInstalled():
+    addonPath = xbmc.translatePath(os.path.join('special://home/addons', 'repository.mossy', 'addon.xml'))
+    if not os.path.exists(addonPath):
+        return False
+    
+    file = open(addonPath)
+    xml = file.read()
+    file.close()
+    
+    soup = BeautifulStoneSoup(xml)
+    
+    version = soup.find('addon')['version']
+    
+    if version == REPO_VERSION:
+        return True
+    
+    return False
+
 
 if __name__ == "__main__":
 
         try:
-            if addon.getSetting('http_cache_disable_adv') == 'false':
-                httpManager.SetCacheDir( CACHE_FOLDER )
+            if not isNewRepoInstalled():
+                dialog = xbmcgui.Dialog()
+                selection = dialog.yesno("Mossy's Addons Repository has moved", "The repository that this plugin was installed", "from has moved. The new version of the", " repository will be installed.", "Cancel", "Install")
+
+                if selection is True:
+                    log("Installing new repository")
+                    #url = "http://mossy-xbmc-repo.googlecode.com/git-history/eden/test/repository.test/repository.test-1.0.3.zip"
+                    url = "http://mossy-xbmc-repo.googlecode.com/git/release/repository.mossy/repository.mossy-%s.zip" % REPO_VERSION
+                    path = xbmc.translatePath(os.path.join('special://home/addons','packages'))
+                    lib=os.path.join(path, 'repository.mossy-%s.zip' % REPO_VERSION)
+                    repoZipData = httpManager.GetHTTPResponse(url).read()
+                
+                    repoZipFile = open(lib, 'w')
+                    repoZipFile.write(repoZipData)
+                    repoZipFile.close()
+                
+                    addonfolder = xbmc.translatePath(os.path.join('special://home/addons',''))
+                    xbmc.executebuiltin("XBMC.Extract(%s,%s)"%(lib,addonfolder))
+                    dialog = xbmcgui.Dialog()
     
-            InitTimeout()
+                    dialog.ok("Repository installed", "Please Restart to take effect")
+            else:
         
-            # Each command processes a web page
-            # Get the web page from the cache if it's there
-            # If there is an error when processing the web page from the cache
-            # we want to try again, this time getting the page from the web
-            httpManager.setGetFromCache(True)
-            success = executeCommand()            
-    
-            xbmc.log(u"success: %s, getGotFromCache(): %s" % (unicode(success), unicode(httpManager.getGotFromCache())), xbmc.LOGDEBUG)
+                if addon.getSetting('http_cache_disable_adv') == 'false':
+                    httpManager.SetCacheDir( CACHE_FOLDER )
+        
+                InitTimeout()
+        
+                # Each command processes a web page
+                # Get the web page from the cache if it's there
+                # If there is an error when processing the web page from the cache
+                # we want to try again, this time getting the page from the web
+                httpManager.setGetFromCache(True)
+                success = executeCommand()            
+        
+                xbmc.log(u"success: %s, getGotFromCache(): %s" % (unicode(success), unicode(httpManager.getGotFromCache())), xbmc.LOGDEBUG)
             
-            if success is not None and success == False and httpManager.getGotFromCache() == True:
-                httpManager.setGetFromCache(False)
-                executeCommand()
-                log (u"executeCommand after", xbmc.LOGDEBUG)
+                if success is not None and success == False and httpManager.getGotFromCache() == True:
+                    httpManager.setGetFromCache(False)
+                    executeCommand()
+                    log (u"executeCommand after", xbmc.LOGDEBUG)
                 
         except:
             # Make sure the text from any script errors are logged
