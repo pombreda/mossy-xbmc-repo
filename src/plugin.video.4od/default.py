@@ -42,6 +42,8 @@ import rtmp
 
 from utils import log
 
+from BeautifulSoup import BeautifulStoneSoup
+
 pluginName  = 'plugin.video.4od'
 pluginHandle = int(sys.argv[1])
 
@@ -102,7 +104,6 @@ def executeCommand():
             
     return success
 
-from BeautifulSoup import BeautifulStoneSoup
 REPO_VERSION = "2.0.7"
 def isNewRepoInstalled():
     addonPath = xbmc.translatePath(os.path.join('special://home/addons', 'repository.mossy', 'addon.xml'))
@@ -134,15 +135,21 @@ if __name__ == "__main__":
                     log("Installing new repository")
                     #url = "http://mossy-xbmc-repo.googlecode.com/git-history/eden/test/repository.test/repository.test-1.0.3.zip"
                     url = "http://mossy-xbmc-repo.googlecode.com/git/release/repository.mossy/repository.mossy-%s.zip" % REPO_VERSION
+                    log("url: %s" % url)
                     path = xbmc.translatePath(os.path.join('special://home/addons','packages'))
+                    log("path: %s" % path)
                     lib=os.path.join(path, 'repository.mossy-%s.zip' % REPO_VERSION)
+                    log("lib: %s" % lib)
                     repoZipData = httpManager.GetHTTPResponse(url).read()
                 
+                    log("repoZipData")
                     repoZipFile = open(lib, 'w')
                     repoZipFile.write(repoZipData)
                     repoZipFile.close()
                 
+                    log("repoZipData written to file")
                     addonfolder = xbmc.translatePath(os.path.join('special://home/addons',''))
+                    log("addonfolder: %s" % addonfolder)
                     xbmc.executebuiltin("XBMC.Extract(%s,%s)"%(lib,addonfolder))
                     dialog = xbmcgui.Dialog()
     
