@@ -20,7 +20,7 @@
 
 <addon id="plugin.video.4od"
        name="4oD"
-       version="3.0.7"
+       version="3.0.8"
        provider-name="mossy">
     <requires>
         <import addon="script.module.socksipy" version="2.0.0"/>
@@ -81,7 +81,7 @@
 
 <addon id="plugin.video.irishtv"
        name="Irish TV"
-       version="2.0.8"
+       version="2.0.9"
        provider-name="mossy">
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
