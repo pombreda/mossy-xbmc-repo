@@ -1,5 +1,5 @@
 Version 3.0.9 (16 Mar 2013)
-- Fix downloads
+- Prevent potential divide-by-zero problem when "Show Watched" is on.
 
 Version 3.0.8 (15 Mar 2013)
 - Fix downloads
