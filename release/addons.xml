@@ -1,49 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="repository.mossy"
-        name="Mossy's Frodo Add-ons"
-        version="2.0.7"
-        provider-name="mossy">
-    <extension point="xbmc.addon.repository"
-        name="Mossy's Add-ons">
-        <info compressed="false">http://mossy-xbmc-repo.googlecode.com/git/release/addons.xml</info>
-        <checksum>http://mossy-xbmc-repo.googlecode.com/git/release/addons.xml.md5</checksum>
-        <datadir zip="true">http://mossy-xbmc-repo.googlecode.com/git/release</datadir>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary>Install add-ons from Mossys add-on repository</summary>
-        <description>Home of Irish TV Player &amp; 4oD</description>
-        <disclaimer>If it breaks, you get to keep the pieces</disclaimer>
-        <platform>all</platform>
-    </extension>
-</addon>
-
-<addon id="plugin.video.4od"
-       name="4oD"
-       version="3.0.12"
-       provider-name="mossy">
-    <requires>
-        <import addon="script.module.socksipy" version="2.0.0"/>
-    	<import addon="script.module.beautifulsoup" version="3.2.0"/>
-        <import addon="xbmc.python" version="2.1.0"/>
-    </requires>
-    <extension point="xbmc.python.pluginsource"
-               library="default.py">
-        <provides>video</provides>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <language>en</language>
-        <platform>all</platform>
-        <summary>Channel 4 On Demand</summary>
-        <description>Channel 4 On Demand</description>
-        <disclaimer>May not work outside the UK and Ireland</disclaimer>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 3, 29 June 2007</license>
-        <forum>http://forum.xbmc.org/showthread.php?tid=134118</forum>
-        <website>http://code.google.com/p/mossy-xbmc-repo/</website>
-        <source>http://code.google.com/p/plugin-video-4od/source/browse/</source>
-    </extension>
-</addon>
-
 <addon id="plugin.video.vine"
        name="Vine"
        version="2.0.0"
@@ -83,9 +39,53 @@
   </extension>
 </addon>
 
+<addon id="plugin.video.4od"
+       name="4oD"
+       version="3.0.12"
+       provider-name="mossy">
+    <requires>
+        <import addon="script.module.socksipy" version="2.0.0"/>
+    	<import addon="script.module.beautifulsoup" version="3.2.0"/>
+        <import addon="xbmc.python" version="2.1.0"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource"
+               library="default.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <language>en</language>
+        <platform>all</platform>
+        <summary>Channel 4 On Demand</summary>
+        <description>Channel 4 On Demand</description>
+        <disclaimer>May not work outside the UK and Ireland</disclaimer>
+        <license>GNU GENERAL PUBLIC LICENSE. Version 3, 29 June 2007</license>
+        <forum>http://forum.xbmc.org/showthread.php?tid=134118</forum>
+        <website>http://code.google.com/p/mossy-xbmc-repo/</website>
+        <source>http://code.google.com/p/plugin-video-4od/source/browse/</source>
+    </extension>
+</addon>
+
+<addon id="repository.mossy"
+        name="Mossy's Frodo Add-ons"
+        version="2.0.7"
+        provider-name="mossy">
+    <extension point="xbmc.addon.repository"
+        name="Mossy's Add-ons">
+        <info compressed="false">http://mossy-xbmc-repo.googlecode.com/git/release/addons.xml</info>
+        <checksum>http://mossy-xbmc-repo.googlecode.com/git/release/addons.xml.md5</checksum>
+        <datadir zip="true">http://mossy-xbmc-repo.googlecode.com/git/release</datadir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>Install add-ons from Mossys add-on repository</summary>
+        <description>Home of Irish TV Player &amp; 4oD</description>
+        <disclaimer>If it breaks, you get to keep the pieces</disclaimer>
+        <platform>all</platform>
+    </extension>
+</addon>
+
 <addon id="plugin.video.irishtv"
        name="Irish TV"
-       version="2.0.10"
+       version="2.0.11"
        provider-name="mossy">
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
