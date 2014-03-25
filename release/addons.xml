@@ -2,7 +2,7 @@
 <addons>
 <addon id="plugin.video.vine"
        name="Vine"
-       version="1.0.0"
+       version="1.0.1"
        provider-name="mossy">
     <requires>
         <import addon="script.module.socksipy" version="1.0.0"/>
