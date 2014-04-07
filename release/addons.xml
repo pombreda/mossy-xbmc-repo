@@ -41,7 +41,7 @@
 
 <addon id="plugin.video.4od"
        name="4oD"
-       version="4.0.0"
+       version="4.0.1"
        provider-name="mossy">
     <requires>
         <import addon="script.module.socksipy" version="2.0.0"/>
@@ -85,13 +85,14 @@
 
 <addon id="plugin.video.irishtv"
        name="Irish TV"
-       version="2.0.17"
+       version="2.1.0"
        provider-name="mossy">
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.socksipy" version="2.0.0"/>
         <import addon="script.module.pyamf" version="0.6.1"/>
     	<import addon="script.module.beautifulsoup" version="3.2.0"/>
+        <import addon="script.module.requests2" version="2.2.1"/>
     </requires>
     <extension point="xbmc.python.pluginsource"
                library="default.py">
